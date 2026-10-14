@@ -1,0 +1,450 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CIRCLE / Miles — Executive Home v1.3</title><style>
+:root{--bg:#15191f;--panel:#20252d;--panel2:#2a3039;--line:#3a4350;--text:#f5f6f8;--muted:#b1bac5;--soft:#d7dde4;--accent:#ddb884;--good:#9fc0a5;--warn:#ddb074;--bad:#d79a9a}. *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}body{min-height:100vh}.shell{display:grid;grid-template-columns:235px 1fr;min-height:100vh}.sidebar{border-right:1px solid var(--line);padding:28px 18px;position:sticky;top:0;height:100vh;background:#12161b}.brand{font-size:20px;font-weight:800;letter-spacing:.16em;margin:0 10px 4px}.version{margin:0 10px 30px;color:var(--muted);font-size:12px}.nav{display:flex;flex-direction:column;gap:6px}.nav button{appearance:none;border:0;background:transparent;color:var(--muted);text-align:left;padding:11px 12px;border-radius:10px;cursor:pointer}.nav button:hover,.nav button.active{background:var(--panel2);color:var(--text)}.sidebar-foot{position:absolute;left:28px;right:28px;bottom:26px;color:var(--muted);font-size:11px;line-height:1.45}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--good);margin-right:6px}.main{padding:42px 48px 64px;max-width:1500px;width:100%}.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--accent);font-weight:700}h1{font-size:38px;line-height:1.08;margin:8px 0 8px;letter-spacing:-.03em}.lede{color:var(--muted);margin:0 0 28px;max-width:820px;font-size:15px;line-height:1.55}.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px}.card{background:linear-gradient(180deg,var(--panel),#1a1f26);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 8px 24px rgba(0,0,0,.14)}.span-3{grid-column:span 3}.span-4{grid-column:span 4}.span-6{grid-column:span 6}.span-8{grid-column:span 8}.span-12{grid-column:span 12}.metric{font-size:34px;font-weight:750;letter-spacing:-.04em;margin-top:8px}.metric.small{font-size:27px}.label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}.section-title{font-size:17px;margin:0 0 4px}.section-sub{font-size:13px;color:var(--muted);margin:0 0 16px}.entity-card{cursor:pointer;transition:.15s ease}.entity-card:hover{border-color:#434b56;transform:translateY(-1px)}.row{display:flex;justify-content:space-between;gap:14px;align-items:center}.badge{font-size:11px;padding:5px 8px;border-radius:999px;border:1px solid var(--line);color:var(--soft);background:#1a1f26}.badge.live{border-color:#35523d;color:#b7d4bc;background:#132018}.badge.pre{border-color:#5b4930;color:#e0c294;background:#201a12}.badge.warn{border-color:#6a5234;color:#e0bd86;background:#211911}.kicker{font-size:12px;color:var(--muted);margin-top:12px}.value{font-size:15px;margin-top:4px;line-height:1.4}.delta{font-size:12px;margin-top:5px;color:var(--muted)}.delta.down{color:#d69a9a}.attention{display:flex;gap:12px;padding:13px 0;border-top:1px solid var(--line)}.attention:first-of-type{border-top:0}.att-dot{width:9px;height:9px;border-radius:50%;background:var(--warn);margin-top:6px;flex:none}.empty{color:var(--muted);font-size:13px;padding:14px 0}.source{display:flex;justify-content:space-between;gap:16px;align-items:center;border-top:1px solid var(--line);padding:14px 0}.source:first-of-type{border-top:0}.source a{color:var(--text);text-decoration:none}.source a:hover{text-decoration:underline}.change{display:grid;grid-template-columns:55px 1fr;gap:12px;padding:11px 0;border-top:1px solid var(--line)}.change:first-of-type{border-top:0}.change time{color:var(--muted);font-size:11px;padding-top:2px}.change strong{font-size:13px}.change p{font-size:12px;color:var(--muted);margin:3px 0 0;line-height:1.45}.status-list{display:grid;gap:10px}.status-row{display:grid;grid-template-columns:1.2fr .8fr 1.5fr;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:12px}.status-row:first-child{border-top:0}.status-row div:nth-child(2){color:var(--soft)}.status-row div:nth-child(3){color:var(--muted)}.back{appearance:none;border:0;background:transparent;color:var(--muted);padding:0;cursor:pointer;margin-bottom:20px}.back:hover{color:var(--text)}.hidden{display:none!important}.footer-note{margin-top:26px;color:#747d87;font-size:11px}.strongline{font-size:26px;font-weight:760;letter-spacing:-.025em;margin-top:8px}.subline{font-size:12px;color:var(--muted);margin-top:5px}.mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}.mini{padding:12px;border:1px solid var(--line);border-radius:12px;background:#1b2027}.mini b{display:block;font-size:18px}.mini span{font-size:11px;color:var(--muted)}@media(max-width:900px){.shell{grid-template-columns:1fr}.sidebar{height:auto;position:relative;border-right:0;border-bottom:1px solid var(--line);padding:18px}.brand,.version{margin-left:0}.version{margin-bottom:12px}.nav{flex-direction:row;overflow:auto}.sidebar-foot{display:none}.main{padding:28px 20px 48px}.span-3,.span-4,.span-6,.span-8,.span-12{grid-column:span 12}.mini-grid{grid-template-columns:repeat(2,1fr)}h1{font-size:30px}}
+
+.decision{padding:14px 0;border-top:1px solid var(--line)}
+.decision:first-of-type{border-top:0}
+.decision p{font-size:12px;color:var(--muted);line-height:1.5;margin:5px 0 9px}
+
+ .archive-strip{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#232932;color:#eed0a3;font-size:11px;letter-spacing:.05em;margin-bottom:22px}.snapshot-warning{display:flex;flex-direction:column;gap:6px;padding:15px 18px;border:1px solid #856744;background:#2a2218;border-radius:12px;color:#f0d5ad;font-size:13px;line-height:1.45}.snapshot-warning span{color:#c4ad8b}.system-card{min-height:218px;position:relative}.system-card h2{margin:8px 0;font-size:23px}.system-card p{font-size:13px;color:var(--muted);line-height:1.55;max-width:420px}.system-icon{position:absolute;top:18px;right:20px;color:var(--accent);opacity:.7;font-size:21px;font-weight:700}.status-pill{display:inline-block;margin-top:8px;font-size:11px;color:#e2c28d;border:1px solid #6c5a3f;border-radius:20px;padding:5px 9px;background:rgba(221,184,132,.08)}.action-button{border:1px solid #8a7150;background:#342a1f;color:#f2d5a8;border-radius:9px;padding:10px 13px;cursor:pointer}.source-line{display:flex;justify-content:space-between;font-size:12px;padding:12px 0;border-bottom:1px solid var(--line);gap:12px}.source-line span{color:var(--muted)}.source-line strong{color:#e2c28d}.nav button{width:100%}@media(max-width:900px){.shell{grid-template-columns:1fr}.sidebar{height:auto;position:relative;padding:16px;border-right:0;border-bottom:1px solid var(--line)}.sidebar-foot{display:none}.nav{flex-direction:row;flex-wrap:wrap}.nav button{width:auto}.main{padding:25px 18px}.span-3,.span-4,.span-6,.span-8{grid-column:span 12}}
+</style><style> .work-form{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0} .work-form input{flex:1;min-width:180px} .work-form input,.work-form select,.link-input{padding:11px;border:1px solid #a9a39b;border-radius:6px;background:#fcfaf6;color:#24211e;max-width:100%;font:inherit}.work-row{display:flex;align-items:start;justify-content:space-between;gap:12px;border-top:1px solid #ded9d1;padding:13px 0}.work-row.done{opacity:.53}.work-meta{font-size:11px;opacity:.7;margin-top:5px}.work-buttons{display:flex;gap:5px;flex-wrap:wrap}.work-buttons button,.url-launch{padding:6px 8px;border:1px solid #aaa;background:transparent;border-radius:5px;cursor:pointer;color:inherit;font:inherit;font-size:11px}.link-entry{margin:13px 0}.link-entry label{display:block;font-size:12px;font-weight:650;margin-bottom:4px}.link-entry input{width:100%;box-sizing:border-box;font-size:12px}.link-actions{margin-top:5px;display:flex;gap:6px}.import-label{display:block;margin-top:10px;font-size:12px;cursor:pointer}.import-label input{display:block;margin-top:5px;width:100%;font-size:11px}#local-status{margin-top:10px;min-height:16px}</style><style>.sourcegrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}.sourcebox{border:1px solid #4a5753;background:#2a322e;padding:17px;border-radius:10px;min-width:0;box-shadow:0 6px 18px rgba(0,0,0,.12)}.sourcebox p{font-size:13px;line-height:1.5;color:#e4eae5}.slabel{font-size:11px;letter-spacing:.1em;color:#cad3ce}.svalue{font-size:30px;font-weight:750;color:#fbf7ef;margin:9px 0}.smeta{font-size:12px;color:#c1cac5;line-height:1.5}.sourcebox a{display:inline-block;margin-top:14px;color:#f0cf96;font-size:12px;text-decoration:underline}@media(max-width:720px){.sourcegrid{grid-template-columns:1fr}}</style><style>
+.mail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin:16px 0}.mail-item{padding:17px;border:1px solid #61716c;border-radius:12px;background:#243031;display:flex;flex-direction:column;gap:9px;box-shadow:0 6px 18px rgba(0,0,0,.12)}.mail-item strong{font-size:15px}.mail-item p{font-size:13px;line-height:1.55;margin:0;color:#d7e0e0}.mail-item .mail-meta{color:#d3b88f;font-size:11px;letter-spacing:.08em;text-transform:uppercase}.mail-item .mail-ops{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:auto}.mail-item .mail-ops button{border:1px solid #a5b08e;background:#385042;color:#f2f6ed;padding:9px 12px;border-radius:8px;cursor:pointer}.mail-item .mail-ops a{color:#d8efe0;text-decoration:underline;font-size:13px}.mail-item .mail-ops button:disabled{opacity:.55;cursor:default}
+</style></head><body><div class="shell"><aside class="sidebar"><div class="brand">CIRCLE</div><div class="version">Executive Home v1.3 · Local preview</div><nav class="nav"><button class="active" data-view="home">Home</button><button data-view="portfolio">Portfolio snapshot</button><button data-view="bayberry">Bayberry Garden</button><button data-view="atlas">ATLAS</button></nav><div class="sidebar-foot"><span class="dot"></span>Verified source snapshot<br>Manual refresh required</div></aside><main class="main"><div class="archive-strip">READ-ONLY CONNECTED-SOURCE SNAPSHOT · Oct 14, 2026 · Browser cannot refresh automatically</div>
+<section id="home" class="view">
+<div class="eyebrow">CIRCLE OS · Executive command</div><h1>One institution. Clear sightlines.</h1><p class="lede">Your executive front door to operating companies, capital, development and decision-making. The working systems remain independent; this local preview does not access or modify their data.</p>
+<div class="snapshot-warning"><strong>Connection status: preview only</strong><span>Portfolio figures on the adjacent tabs are archived September 30 snapshots, not current operating results. Live integrations are not configured.</span></div>
+<section id="verified-sources" style="margin:22px 0 32px;padding:22px;border:1px solid #74836c;border-radius:14px;background:#212b26">
+<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px"><div><div style="font-size:11px;letter-spacing:.14em;color:#a9c7ad">CONNECTED-SOURCE SNAPSHOT · READ ONLY</div><h2 style="font-size:23px;margin:8px 0">What the systems actually report</h2></div><div style="font-size:12px;color:#d5b37d">Retrieved Oct 14, 2026 · not auto-refreshing</div></div>
+<div class="sourcegrid">
+<div class="sourcebox"><div class="slabel">BAYBERRY · WEEK ENDING OCT 11</div><div class="svalue">$70,640</div><p>Net sales · Toast API, provisional</p><div class="smeta">1,088 covers · $64.93 per cover</div><a href="https://docs.google.com/spreadsheets/d/1meMGMy8CuJijIwJmzUp092ZNi1Myeq57EyKCV_x60SI/edit#gid=878707690" target="_blank" rel="noopener noreferrer">Open financial weekly review ↗</a></div>
+<div class="sourcebox"><div class="slabel">BAYBERRY · OPEN ATTENTION</div><div class="svalue">8</div><p>Registry actions in progress or open · excluding the blocked budget sign-off</p><div class="smeta">2027 budget sign-off blocked pending confirmed Q4 results</div><a href="https://docs.google.com/spreadsheets/d/1pcF6-T6b85jXS6CJ525XzO-ALdqDEDEDE9dFOYZDJ4o/edit#gid=1264420477" target="_blank" rel="noopener noreferrer">Open Miles Attention ↗</a></div>
+<div class="sourcebox"><div class="slabel">ATLAS · CAPITAL GATE</div><div class="svalue">$26K over</div><p>Registry lists $451K known startup uses against a $425K ceiling</p><div class="smeta">Support-kitchen / startup-tech replacements unresolved; figures are registry snapshot, not a current approved budget</div><a href="https://docs.google.com/spreadsheets/d/1pcF6-T6b85jXS6CJ525XzO-ALdqDEDEDE9dFOYZDJ4o/edit#gid=839886288" target="_blank" rel="noopener noreferrer">Open portfolio source ↗</a></div>
+<div class="sourcebox"><div class="slabel">CANONICAL ENTITY RECORDS</div><div class="svalue">2</div><p>ENT-0101 Bayberry Garden · OPEN / ACTIVE</p><p>ENT-0102 ATLAS · SECURE / PREOPEN</p><div class="smeta">Example entities in registry excluded</div><a href="https://docs.google.com/spreadsheets/d/1pcF6-T6b85jXS6CJ525XzO-ALdqDEDEDE9dFOYZDJ4o/edit#gid=1001" target="_blank" rel="noopener noreferrer">Open entity registry ↗</a></div>
+</div><p style="font-size:12px;color:#c0cbc8;margin:18px 0 0">Source truth: CIRCLE Core Registry v0.1 and Bayberry Financial Workbook V2; Gmail messages as individually linked below. These values were read via the authorized Google Drive connection when this file was built. Browser refresh does not update them. Local workboard items below are separate and do not write back to either source.</p></section><section id="mail-intelligence" style="margin:20px 0 30px;padding:22px;border:1px solid #6d837d;border-radius:14px;background:#203033">
+<div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:baseline"><div><div class="eyebrow">CIRCLE / CORRESPONDENCE INTELLIGENCE</div><h2 style="margin:8px 0 5px">Signals worth your attention</h2></div><div class="mail-meta" style="font-size:12px;color:#d5b37d">Gmail retrieved October 14, 2026 · static snapshot</div></div>
+<p class="section-sub">These are verified email signals, not inferred task completion. Open the original message, or promote a signal to the local executive workboard for follow-through. Nothing is written back to Gmail, Miles, or the Registry.</p>
+<div class="mail-grid">
+<article class="mail-item" data-signal="atlas-intro"><div class="mail-meta">ATLAS · CAPITAL · Oct 14</div><strong>Prospectus introduced to Carlo / Kyle</strong><p>The forwarded introduction positions ATLAS as a restaurant investment opportunity. Review the introduction and determine follow-up ownership.</p><div class="mail-ops"><a href="https://mail.google.com/mail/u/?authuser=hart%40bayberrygarden.com#all/1a13a940a137c1fd" target="_blank" rel="noopener noreferrer">Source email ↗</a><button type="button" data-promote="atlas-intro" data-entity="ATLAS" data-kind="Action" data-title="Review Carlo/Kyle ATLAS prospectus introduction and plan follow-up">Add follow-up</button></div></article>
+<article class="mail-item" data-signal="atlas-bank"><div class="mail-meta">ATLAS · CAPITAL · Oct 13</div><strong>Christopher Stevens: prospectus circulation</strong><p>Christopher acknowledged the digital prospectus and said it would be shared. Await actual investor feedback before changing pipeline status.</p><div class="mail-ops"><a href="https://mail.google.com/mail/u/?authuser=hart%40bayberrygarden.com#all/1a135975e63f7793" target="_blank" rel="noopener noreferrer">Source email ↗</a><button type="button" data-promote="atlas-bank" data-entity="ATLAS" data-kind="Action" data-title="Follow up on Christopher Stevens ATLAS prospectus circulation">Add follow-up</button></div></article>
+<article class="mail-item" data-signal="atlas-landlord"><div class="mail-meta">ATLAS · REAL ESTATE · Oct 9</div><strong>Joanna: opportunity may be shared</strong><p>Joanna confirmed your 200 Washington information would go to ownership and prospective partner circulation was acceptable. Fit-out and capital gates remain separate.</p><div class="mail-ops"><a href="https://mail.google.com/mail/u/?authuser=hart%40bayberrygarden.com#all/1a120d3f0901c342" target="_blank" rel="noopener noreferrer">Source email ↗</a><button type="button" data-promote="atlas-landlord" data-entity="ATLAS" data-kind="Action" data-title="Review Joanna ownership feedback and next ATLAS landlord gate">Add follow-up</button></div></article>
+<article class="mail-item" data-signal="bay-xtrachef"><div class="mail-meta">BAYBERRY · OPERATIONS · Oct 14</div><strong>xtraCHEF exception queue</strong><p>Today's digest reports 3 exceptions and 19 inventory-mapping items. These counts come from the email digest, not a verified resolution audit.</p><div class="mail-ops"><a href="https://mail.google.com/mail/u/?authuser=hart%40bayberrygarden.com#all/1a1389493f8569c2" target="_blank" rel="noopener noreferrer">Source email ↗</a><button type="button" data-promote="bay-xtrachef" data-entity="Bayberry Garden" data-kind="Action" data-title="Triage 3 xtraCHEF exceptions and 19 inventory mapping items">Add follow-up</button></div></article>
+<article class="mail-item" data-signal="bay-thanksgiving"><div class="mail-meta">BAYBERRY · PROGRAMMING · Oct 13</div><strong>Thanksgiving online ordering ready</strong><p>Natalie reported the Thanksgiving catering Toast site is ready. The launch decision and associated promotion still need explicit confirmation.</p><div class="mail-ops"><a href="https://mail.google.com/mail/u/?authuser=hart%40bayberrygarden.com#all/1a1374f4390b02fc" target="_blank" rel="noopener noreferrer">Source email ↗</a><button type="button" data-promote="bay-thanksgiving" data-entity="Bayberry Garden" data-kind="Decision" data-title="Confirm Thanksgiving catering launch and promotion ownership">Add decision</button></div></article>
+<article class="mail-item"><div class="mail-meta">INTEGRATION STATUS</div><strong>Gmail + Calendar authorized in ChatGPT</strong><p>Both systems are accessible through authorized connectors for preparing sourced snapshots. This standalone HTML does not contain credentials or auto-refresh. Local follow-ups do not modify Google services.</p><div class="mail-ops"><span style="font-size:12px;color:#c3cecd">Verified sources · Manual snapshot refresh</span></div></article>
+</div><p id="mail-promotion-status" role="status" style="color:#d5b37d;font-size:13px"></p>
+</section><section id="calendar-intelligence" style="margin:20px 0 30px;padding:22px;border:1px solid #6d837d;border-radius:14px;background:#203033">
+<div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:baseline"><div><div class="eyebrow">CIRCLE / CALENDAR INTELLIGENCE</div><h2 style="margin:8px 0 5px">Upcoming commitments</h2></div><span class="mail-meta" style="color:#d5b37d">Google Calendar checked Oct 14, 2026 · snapshot</span></div>
+<p class="section-sub">Primary calendar: hart@bayberrygarden.com · Window: October 14–28, 2026 (Eastern). One confirmed event returned. Calendars and appointments may change after this snapshot.</p>
+<div class="mail-grid"><article class="mail-item" data-signal="calendar-ariana-stage"><div class="mail-meta">BAYBERRY · SAT OCT 17 · 9:00 AM–2:00 PM ET</div><strong>Ariana Monegro stage</strong><p>Confirmed calendar event. Consider preparing the stage plan and the kitchen's point of contact; no preparation task is assumed complete.</p><div class="mail-ops"><a href="https://www.google.com/calendar/event?eid=ZWQwc3ZpcGpuOTBoMTA5c3NoNW9wcmw5bDQgaGFydEBiYXliZXJyeWdhcmRlbi5jb20" target="_blank" rel="noopener noreferrer">Open calendar event ↗</a><button type="button" data-promote="calendar-ariana-stage" data-entity="Bayberry Garden" data-kind="Action" data-title="Prepare for Ariana Monegro stage on October 17, 9 AM–2 PM">Add follow-up</button></div></article>
+<article class="mail-item"><div class="mail-meta">SOURCE HEALTH</div><strong>Calendar is accessible; dashboard sync is not deployed</strong><p>Calendar information was retrieved from the authorized Google Calendar connector. No secret or token is embedded in this file. Use the link below to access your actual schedule.</p><div class="mail-ops"><a href="https://calendar.google.com/calendar/u/0/r" target="_blank" rel="noopener noreferrer">Open Google Calendar ↗</a></div></article></div>
+<p id="calendar-promotion-status" role="status" style="color:#d5b37d;font-size:13px"></p>
+<div class="grid" style="margin-top:22px" id="interactive-board">
+ <div class="card span-8"><div class="eyebrow">Working locally · persists in this browser</div><h2 class="section-title">Executive workboard <span id="open-count" style="font-size:13px;font-weight:400"></span></h2><p class="section-sub">Track real decisions and next moves while source connections are being established. These entries are local notes, not updates to Miles.</p>
+ <form id="work-form" class="work-form"><input id="work-title" placeholder="Decision, blocker or action" required maxlength="180" aria-label="Work item"><select id="work-entity" aria-label="Entity"><option>CIRCLE</option><option>Bayberry Garden</option><option>ATLAS</option><option>Miles</option></select><select id="work-kind" aria-label="Type"><option>Action</option><option>Decision</option><option>Blocker</option></select><button type="submit" class="action-button">Add item +</button></form><div id="work-items" aria-live="polite"></div></div>
+ <div class="card span-4"><div class="eyebrow">Launchpad · local configuration</div><h2 class="section-title">Connect your destinations</h2><p class="section-sub">Verified financial, portfolio, and Google Calendar URLs are prefilled. Miles and Founder Dashboard still need their actual app addresses. These are launch links, not live API connections.</p><div id="system-links"></div><button type="button" class="action-button" id="export-state">Export local workboard ↓</button><label class="import-label">Import workboard JSON <input type="file" accept="application/json,.json" id="import-state"></label><p class="kicker" id="local-status"></p></div>
+</div>
+<div class="grid" style="margin-top:22px">
+<div class="card span-6 system-card"><div class="system-icon">01</div><div class="eyebrow">Operating intelligence</div><h2>Miles</h2><p>Restaurant execution, menu and recipe systems, operational work, and chef tools.</p><span class="status-pill">User reports working · URL not verified</span></div>
+<div class="card span-6 system-card"><div class="system-icon">02</div><div class="eyebrow">Financial intelligence</div><h2>Financial workbook</h2><p>Operating and planning economics remain in the established workbook. No financial data duplicated here.</p><span class="status-pill">Verified Google Sheet link prefilled</span></div>
+<div class="card span-6 system-card"><div class="system-icon">03</div><div class="eyebrow">Founder</div><h2>Founder Dashboard</h2><p>Founder priorities, personal executive rhythm, and commitments. Kept distinct from staff operating material.</p><span class="status-pill">User reports working · URL not verified</span></div>
+<div class="card span-6 system-card"><div class="system-icon">04</div><div class="eyebrow">Institutional portfolio</div><h2>CIRCLE Portfolio</h2><p>Bayberry Garden ENT-0101 and ATLAS ENT-0102 / DEV-0102. Review the recovered portfolio cockpit without treating archived metrics as current.</p><button class="action-button" data-view="portfolio">Open historical cockpit →</button><p class="kicker">Authoritative Registry URL is prefilled in the launchpad.</p></div>
+<div class="card span-8"><h2 class="section-title">Executive attention</h2><p class="section-sub">Planned consolidated queue · not yet connected to source systems</p><div class="attention"><div class="att-dot"></div><div><strong>Decisions &amp; approvals</strong><div class="value">Connect authoritative decision register read-only; preserve decision status and ownership.</div></div></div><div class="attention"><div class="att-dot"></div><div><strong>Projects &amp; gates</strong><div class="value">Surface active milestones, blockers and upcoming actions for each entity.</div></div></div><div class="attention"><div class="att-dot"></div><div><strong>Performance exceptions</strong><div class="value">Present verified source timestamps and exception thresholds before any operating numbers.</div></div></div></div>
+<div class="card span-4"><h2 class="section-title">Source trust</h2><p class="section-sub">Connectivity register</p><div class="source-line"><span>Miles</span><strong>Unverified</strong></div><div class="source-line"><span>Financial workbook</span><strong>Linked · snapshot</strong></div><div class="source-line"><span>Founder Dashboard</span><strong>Unverified</strong></div><div class="source-line"><span>Portfolio registry</span><strong>Snapshot</strong></div><div class="source-line"><span>Google Calendar</span><strong>Connected in ChatGPT · snapshot</strong></div><div class="kicker" style="margin-top:18px">Never claim live data without a tested source.</div></div>
+</div></section>
+
+<section id="portfolio" class="view hidden">
+  <div class="eyebrow">Historical snapshot · September 30, 2026</div>
+  <h1>The institution, right now.</h1>
+  <p class="lede">One operating business and one active development project. CIRCLE surfaces the real work, current gates, decisions, blockers and source health without duplicating the underlying authorities.</p>
+
+  <div class="grid">
+    <div class="card span-3"><div class="label">Snapshot entities</div><div class="metric">2</div><div class="delta">Bayberry + ATLAS</div></div>
+    <div class="card span-3"><div class="label">Snapshot attention items</div><div class="metric">10</div><div class="delta">9 Bayberry · 1 ATLAS</div></div>
+    <div class="card span-3"><div class="label">Explicit blockers</div><div class="metric">1</div><div class="delta">2027 budget sign-off</div></div>
+    <div class="card span-3"><div class="label">Snapshot decisions</div><div class="metric">3</div><div class="delta">1 Bayberry · 2 ATLAS</div></div>
+
+    <div class="card span-6 entity-card" data-open="bayberry">
+      <div class="row"><div><div class="eyebrow">Bayberry Garden · Operating business</div><h2 class="section-title" style="margin-top:6px">Operating pulse</h2></div><span class="badge live">ACTIVE</span></div>
+      <div class="mini-grid">
+        <div class="mini"><b>$56.6K</b><span>weekly sales</span></div>
+        <div class="mini"><b>1,061</b><span>covers</span></div>
+        <div class="mini"><b>$53.38</b><span>sales / cover</span></div>
+        <div class="mini"><b>-20.1%</b><span>vs prior 4-week sales baseline</span></div>
+      </div>
+      <div class="kicker">Current priority</div>
+      <div class="value">Turn current economic analysis into measurable revenue / contribution actions.</div>
+      <div class="kicker">Next gate</div>
+      <div class="value">Consistent profitability + defined ownership / partnership path.</div>
+    </div>
+
+    <div class="card span-6 entity-card" data-open="atlas">
+      <div class="row"><div><div class="eyebrow">ATLAS · Development project</div><h2 class="section-title" style="margin-top:6px">Development pulse</h2></div><span class="badge pre">SECURE</span></div>
+      <div class="mini-grid">
+        <div class="mini"><b>$410K</b><span>startup uses</span></div>
+        <div class="mini"><b>$120K</b><span>protected working capital</span></div>
+        <div class="mini"><b>$1.064M</b><span>base-case sales</span></div>
+        <div class="mini"><b>4</b><span>truth lanes mapped</span></div>
+      </div>
+      <div class="kicker">Current priority</div>
+      <div class="value">Secure 200 Washington / align fit-out.</div>
+      <div class="kicker">Next gate</div>
+      <div class="value">Landlord fit-out response / deal alignment.</div>
+    </div>
+
+    <div class="card span-8">
+      <h2 class="section-title">Needs attention</h2>
+      <p class="section-sub">Explicit state only. No inferred urgency.</p>
+
+      <div class="attention">
+        <div class="att-dot"></div>
+        <div>
+          <strong>Bayberry · 2027 budget sign-off</strong>
+          <div class="value">Blocked until confirmed Q4 results.</div>
+          <div class="kicker">ACT-BAY-0109 · BLOCKED · Executive</div>
+        </div>
+      </div>
+
+      <div class="attention">
+        <div class="att-dot"></div>
+        <div>
+          <strong>ATLAS · Landlord fit-out response / deal alignment</strong>
+          <div class="value">Current Development next gate at stage SECURE.</div>
+          <div class="kicker">DEV-0102 · Development</div>
+        </div>
+      </div>
+
+      <div class="attention">
+        <div class="att-dot"></div>
+        <div>
+          <strong>Bayberry · Resolve staffing structure</strong>
+          <div class="value">Define maintain-operation roles versus proposed changes and cost them in Labor Planning.</div>
+          <div class="kicker">ACT-BAY-0107 · OPEN · HIGH</div>
+        </div>
+      </div>
+
+      <div class="attention">
+        <div class="att-dot"></div>
+        <div>
+          <strong>Bayberry · Set programming priorities</strong>
+          <div class="value">Cost initiatives with incremental labor and other direct costs.</div>
+          <div class="kicker">ACT-BAY-0108 · OPEN · HIGH</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card span-4">
+      <h2 class="section-title">Where can I help?</h2>
+      <p class="section-sub">The most concrete currently open work.</p>
+
+      <div class="help-item">
+        <strong>Bayberry staffing structure</strong>
+        <p>Open and high priority. This can move now without waiting on another recorded prerequisite.</p>
+      </div>
+      <div class="help-item" style="margin-top:10px">
+        <strong>Bayberry programming priorities</strong>
+        <p>Open and high priority. Build the assumptions before judging contribution.</p>
+      </div>
+      <div class="help-item" style="margin-top:10px">
+        <strong>ATLAS fit-out package</strong>
+        <p>Current gate is known; the work is coordination with landlord scope, cut sheets, utilities and deal alignment.</p>
+      </div>
+    </div>
+
+    <div class="card span-6">
+      <h2 class="section-title">Work already moving · Bayberry</h2>
+      <p class="section-sub">Active workstreams inherited from the proven OS mechanics.</p>
+      <div class="work"><strong>Revenue Growth Plan</strong><span class="badge live">IN PROGRESS · HIGH</span></div>
+      <div class="work"><strong>Labor Gear Matrix</strong><span class="badge live">IN PROGRESS · HIGH</span></div>
+      <div class="work"><strong>Events &amp; Private Dining</strong><span class="badge live">IN PROGRESS · HIGH</span></div>
+      <div class="work"><strong>Ownership Path</strong><span class="badge live">IN PROGRESS · HIGH</span></div>
+      <div class="work"><strong>Menu / PMix</strong><span class="badge">IN PROGRESS · MEDIUM</span></div>
+      <div class="work"><strong>Content / Demand Generation</strong><span class="badge">IN PROGRESS · MEDIUM</span></div>
+    </div>
+
+    <div class="card span-6">
+      <h2 class="section-title">Current decisions</h2>
+      <p class="section-sub">Decisions CIRCLE should stop us from casually re-litigating.</p>
+
+      <div class="decision">
+        <strong>Bayberry economic thesis</strong>
+        <p>Prioritize measurable revenue and contribution creation; do not let small percentage-point cost variance dominate the operating thesis.</p>
+        <span class="badge live">DEC-BAY-0101 · ACTIVE</span>
+      </div>
+
+      <div class="decision">
+        <strong>ATLAS kitchen line</strong>
+        <p>96″ Traulsen chef base supporting the Rational, with the locked major hot-line package. Coordination remains; kitchen concept is not reopened.</p>
+        <span class="badge live">DEC-ATL-0101 · ACTIVE</span>
+      </div>
+
+      <div class="decision">
+        <strong>ATLAS interior package</strong>
+        <p>Pera stools, Edith chandelier, Bryant sconces, oxblood leather, tobacco-toned white oak, aged brass, dark leathered stone and antiqued mirror.</p>
+        <span class="badge live">DEC-ATL-0102 · ACTIVE</span>
+      </div>
+    </div>
+
+    <div class="card span-6">
+      <h2 class="section-title">Source health</h2>
+      <p class="section-sub">What CIRCLE knows confidently — and what remains incomplete.</p>
+
+      <div class="readiness"><div><strong>Bayberry Toast POS</strong><span>through 09/27/26</span></div><span class="status good">CONNECTED · PROVISIONAL</span></div>
+      <div class="readiness"><div><strong>Bayberry payroll</strong><span>through 08/30/26</span></div><span class="status bad">NOT CONNECTED</span></div>
+      <div class="readiness"><div><strong>Bayberry purchasing</strong><span>through 08/16/26</span></div><span class="status bad">NOT CONNECTED</span></div>
+      <div class="readiness"><div><strong>Bayberry accounting</strong><span>through 06/30/26</span></div><span class="status bad">NOT CONNECTED</span></div>
+      <div class="readiness"><div><strong>ATLAS project authority</strong><span>Development · Fit-out/Equipment · Culinary · Brand/Design</span></div><span class="status good">MAPPED</span></div>
+    </div>
+
+    <div class="card span-6">
+      <h2 class="section-title">Recent changes</h2>
+      <p class="section-sub">Recorded changes only — newest first.</p>
+
+      <div class="change"><time>15:39</time><div><strong>ATLAS authority map completed</strong><p>Four truth lanes are now mapped without moving detailed source content into CIRCLE.</p></div></div>
+      <div class="change"><time>15:35</time><div><strong>ATLAS Culinary authority registered</strong><p>R&amp;D master became the current Culinary authority.</p></div></div>
+      <div class="change"><time>12:11</time><div><strong>Bayberry workstreams entered history tracking</strong><p>Nine live work items were initialized in Event Log.</p></div></div>
+      <div class="change"><time>11:12</time><div><strong>Bayberry OS mechanics migrated</strong><p>Scoreboard lineage, active workstreams, next gate and drift rule moved into the CIRCLE spine.</p></div></div>
+    </div>
+
+    <div class="card span-12">
+      <h2 class="section-title">Portfolio gates</h2>
+      <p class="section-sub">The institution should know what each project is trying to earn next.</p>
+      <div class="grid">
+        <div class="card span-6">
+          <div class="eyebrow">Bayberry Garden</div>
+          <div class="kicker">Gate</div>
+          <div class="strongline">Consistent profitability + defined ownership / partnership path</div>
+          <div class="kicker">Immediate milestone</div>
+          <div class="value">Lock the next revenue-growth actions and weekly operating scorecard.</div>
+        </div>
+        <div class="card span-6">
+          <div class="eyebrow">ATLAS</div>
+          <div class="kicker">Gate</div>
+          <div class="strongline">Landlord fit-out response / deal alignment</div>
+          <div class="kicker">Immediate milestone</div>
+          <div class="value">Advance the site / deal to an executable agreement.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card span-12">
+      <h2 class="section-title">Authoritative entry points</h2>
+      <p class="section-sub">CIRCLE points into the real work instead of rebuilding it.</p>
+      <div class="source">
+        <div><strong>Bayberry Financial Workbook V2</strong><div class="kicker">Operating performance / Scorecard authority</div></div>
+        <a href="https://docs.google.com/spreadsheets/d/1meMGMy8CuJijIwJmzUp092ZNi1Myeq57EyKCV_x60SI/edit?usp=drivesdk" target="_blank">Open source ↗</a>
+      </div>
+      <div class="source">
+        <div><strong>Atlas_200_Washington_Underwriting</strong><div class="kicker">ATLAS Development / underwriting authority</div></div>
+        <a href="https://docs.google.com/spreadsheets/d/1QDRwx-A5WAPz2GzlsBVzW-Q4I1O2UuSD_D4gi0NoBp4/edit?usp=drivesdk" target="_blank">Open source ↗</a>
+      </div>
+      <div class="source">
+        <div><strong>ATLAS authority stack</strong><div class="kicker">R&amp;D master · fit-out scope · Layout Studio · bar equipment · Render Style Guide + current decisions</div></div>
+        <span class="badge live">REGISTERED</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">Snapshot built from FOUNDING CIRCLE Core Registry v0.1 and registered authorities · 2026-09-30</div>
+</section>
+<section id="bayberry" class="view hidden"><button class="back" data-view="home">← Today</button>
+<div class="eyebrow">ENT-0101 · Operating business · OS lineage migrated</div><h1>Bayberry Garden</h1>
+<p class="lede">The Bayberry page now follows the established OS grammar: operating frame → scoreboard → active workstreams → leadership decisions → drift control → source health.</p>
+<div class="grid">
+
+<div class="card span-8"><div class="eyebrow">Operating frame</div><h2 class="section-title" style="margin-top:8px">Create more contribution dollars</h2>
+<div class="kicker">Current strategic question</div><div class="value">How much more profitable can Bayberry become by growing productive revenue while deploying labor and COGS intelligently?</div>
+<div class="kicker">Current priority</div><div class="value">Turn current economic analysis into measurable revenue / contribution actions.</div>
+<div class="kicker">Next gate</div><div class="value">Consistent profitability + a defined ownership / partnership path.</div></div>
+<div class="card span-4"><div class="eyebrow">Drift control · DEC-BAY-0101</div><div class="strongline" style="font-size:20px">Don’t optimize the thesis away.</div><div class="value">Do not let small percentage-point food-cost variance consume the larger economic question: where can Bayberry create more contribution dollars?</div></div>
+
+<div class="card span-12"><h2 class="section-title">Established Bayberry scoreboard</h2><p class="section-sub">The slots come from the prior OS. Current values come from live registered sources when available; unavailable values remain explicitly unavailable.</p>
+<div class="status-list">
+<div class="status-row"><div><strong>Weekly Sales</strong></div><div>$56,635</div><div>20.1% below prior 4-week baseline of $70,849</div></div>
+<div class="status-row"><div><strong>Contribution Margin</strong></div><div>Not yet measurable</div><div>Current-week payroll and purchasing are not connected; do not infer contribution.</div></div>
+<div class="status-row"><div><strong>Labor %</strong></div><div>35.4% wages / sales</div><div>Jan–Jun available months; current-week payroll is pending. Total labor / sales is 47.3%.</div></div>
+<div class="status-row"><div><strong>COGS %</strong></div><div>29.8% food · 21.6% beverage</div><div>Jan–Jun weighted actuals; current-week purchasing is pending.</div></div>
+<div class="status-row"><div><strong>Guest Count</strong></div><div>1,061</div><div>Week ending 09/27/26; 36 fewer than prior week.</div></div>
+<div class="status-row"><div><strong>Average Check</strong></div><div>$53.38</div><div>Net sales per cover; $9.57 below prior week.</div></div>
+<div class="status-row"><div><strong>Incremental Event Revenue</strong></div><div>Not isolated</div><div>$4,661 is currently classified as Events Sales; incremental contribution has not been separated.</div></div>
+<div class="status-row"><div><strong>Ownership Progress</strong></div><div>Workstream active</div><div>No quantified ownership-progress state is registered yet; do not infer terms.</div></div>
+</div></div>
+
+<div class="card span-4"><div class="label">Weekly net sales</div><div class="metric">$56,635</div><div class="delta down">vs $69,049 prior week</div><div class="delta down">20.1% below prior four-week baseline</div></div>
+<div class="card span-4"><div class="label">Covers</div><div class="metric">1,061</div><div class="delta">36 fewer than prior week</div></div>
+<div class="card span-4"><div class="label">Net sales / cover</div><div class="metric">$53.38</div><div class="delta down">$9.57 below prior week</div></div>
+
+<div class="card span-12"><h2 class="section-title">Current-week sales mix</h2><p class="section-sub">Week ending 09/27/26 · Toast source is provisional; Events Sales is a management classification.</p>
+<div class="mini-grid"><div class="mini"><b>$40,741</b><span>food sales</span></div><div class="mini"><b>$15,835</b><span>beverage sales</span></div><div class="mini"><b>$4,661</b><span>events sales</span></div><div class="mini"><b>$24,746</b><span>dinner food sales</span></div></div>
+<div class="mini-grid"><div class="mini"><b>$3,597</b><span>lunch food sales</span></div><div class="mini"><b>$7,737</b><span>brunch food sales</span></div><div class="mini"><b>$59</b><span>other / unclassified</span></div><div class="mini"><b>$70,849</b><span>prior 4-week sales baseline</span></div></div></div>
+
+<div class="card span-8"><h2 class="section-title">Available monthly financials</h2><p class="section-sub">Jan–Jun 2026 · source actuals are not yet fully reconciled.</p>
+<div class="mini-grid"><div class="mini"><b>$1.588M</b><span>net sales</span></div><div class="mini"><b>35.4%</b><span>wages / net sales</span></div><div class="mini"><b>47.3%</b><span>total labor / net sales</span></div><div class="mini"><b>29.8%</b><span>food COGS / food sales</span></div></div>
+<div class="mini-grid"><div class="mini"><b>$80,261</b><span>reported EBITDA</span></div><div class="mini"><b>$43,408</b><span>reported net income</span></div><div class="mini"><b>75.3%</b><span>prime cost / net sales</span></div><div class="mini"><b>21.6%</b><span>bev COGS / bev sales</span></div></div>
+<div class="kicker">Matched six-month net sales budget: $1.667M · variance: ($79,318).</div></div>
+<div class="card span-4"><h2 class="section-title">Data readiness</h2><div class="status-list">
+<div class="status-row"><div>Toast POS</div><div>09/27/26</div><div>Connected; provisional</div></div>
+<div class="status-row"><div>ADP payroll</div><div>08/30/26</div><div>Not connected</div></div>
+<div class="status-row"><div>Purchasing</div><div>08/16/26</div><div>Not connected</div></div>
+<div class="status-row"><div>Accounting</div><div>06/30/26</div><div>Not connected</div></div></div><div class="kicker">Financial close: 0 of 12 months marked closed.</div></div>
+
+<div class="card span-8"><h2 class="section-title">Active workstreams</h2><p class="section-sub">Migrated from the established Bayberry Project OS into canonical CIRCLE Actions.</p>
+<div class="status-list">
+<div class="status-row"><div>Revenue Growth Plan</div><div>IN PROGRESS</div><div>ACT-BAY-0101 · high priority</div></div>
+<div class="status-row"><div>Labor Gear Matrix</div><div>IN PROGRESS</div><div>ACT-BAY-0102 · high priority</div></div>
+<div class="status-row"><div>Menu / PMix</div><div>IN PROGRESS</div><div>ACT-BAY-0103</div></div>
+<div class="status-row"><div>Events &amp; Private Dining</div><div>IN PROGRESS</div><div>ACT-BAY-0104 · high priority</div></div>
+<div class="status-row"><div>Content / Demand Generation</div><div>IN PROGRESS</div><div>ACT-BAY-0105</div></div>
+<div class="status-row"><div>Ownership Path</div><div>IN PROGRESS</div><div>ACT-BAY-0106 · Executive</div></div>
+</div></div>
+<div class="card span-4"><h2 class="section-title">Leadership queue</h2><p class="section-sub">Current questions from the live Bayberry workbook.</p>
+<div class="attention"><div class="att-dot"></div><div><strong>Resolve staffing structure</strong><div class="value">Define maintain-operation roles versus proposed changes; cost them in Labor planning.</div><div class="kicker">ACT-BAY-0107 · OPEN</div></div></div>
+<div class="attention"><div class="att-dot"></div><div><strong>Set programming priorities</strong><div class="value">Cost each initiative with incremental labor and other direct costs.</div><div class="kicker">ACT-BAY-0108 · OPEN</div></div></div>
+<div class="attention"><div class="att-dot"></div><div><strong>2027 budget sign-off</strong><div class="value">Requires confirmed Q4 results.</div><div class="kicker">ACT-BAY-0109 · BLOCKED</div></div></div></div>
+
+<div class="card span-6"><h2 class="section-title">Authority</h2><div class="source"><div><strong>Bayberry Financial Workbook V2</strong><div class="kicker">Scorecard · financial / planning authority · CURRENT</div></div><a href="https://docs.google.com/spreadsheets/d/1meMGMy8CuJijIwJmzUp092ZNi1Myeq57EyKCV_x60SI/edit?usp=drivesdk" target="_blank">Open ↗</a></div><div class="empty">Headline facts above are promoted into CIRCLE Metrics with source ranges and provenance.</div></div>
+<div class="card span-6"><h2 class="section-title">Migration rule</h2><div class="value">The prior Founder OS remains historical/reference context. CIRCLE inherits proven Bayberry mechanics and current decisions; it does not wholesale import stale portfolio architecture or founder-private scaffolding.</div><div class="kicker">Migration event: EVT-20260930T151200Z-BAY-OS-MIGRATION</div></div>
+
+</div></section>
+<section id="atlas" class="view hidden">
+<button class="back" data-view="home">← Today</button>
+<div class="eyebrow">ENT-0102 · DEV-0102 · Development project</div>
+<h1>ATLAS</h1>
+<p class="lede">CIRCLE now maps the project across four distinct truth lanes: Development / underwriting, fit-out / equipment, Culinary, and brand / design. Detailed work stays in the authorities; the Console shows the state that matters.</p>
+
+<div class="grid">
+  <div class="card span-3"><div class="label">Stage</div><div class="metric small">SECURE</div><div class="delta">active site · underwriting current</div></div>
+  <div class="card span-3"><div class="label">Startup uses</div><div class="metric small">$410K</div><div class="delta">$15K below $425K ceiling</div></div>
+  <div class="card span-3"><div class="label">Protected working capital</div><div class="metric small">$120K</div><div class="delta">must remain untouched at opening</div></div>
+  <div class="card span-3"><div class="label">Base-case net sales</div><div class="metric small">$1.064M</div><div class="delta">stabilized underwriting</div></div>
+
+  <div class="card span-8">
+    <h2 class="section-title">Current project frame</h2>
+    <div class="kicker">Priority</div><div class="value">Secure 200 Washington / align fit-out.</div>
+    <div class="kicker">Next gate</div><div class="value">Landlord fit-out response / deal alignment.</div>
+    <div class="kicker">Milestone</div><div class="value">Advance the site / deal to an executable agreement.</div>
+  </div>
+  <div class="card span-4">
+    <h2 class="section-title">Base-case operating model</h2>
+    <div class="mini-grid">
+      <div class="mini"><b>32.0</b><span>covers / night</span></div>
+      <div class="mini"><b>$95</b><span>average check</span></div>
+      <div class="mini"><b>1.8x</b><span>seat turns</span></div>
+      <div class="mini"><b>20.4</b><span>cash break-even covers</span></div>
+    </div>
+  </div>
+
+  <div class="card span-12">
+    <h2 class="section-title">Underwriting pulse</h2>
+    <p class="section-sub">Current native underwriting authority. These are projections / deal constraints, not operating actuals.</p>
+    <div class="grid">
+      <div class="card span-3"><div class="label">Cash after debt</div><div class="metric small">$245,690</div><div class="delta">base case</div></div>
+      <div class="card span-3"><div class="label">EBITDA margin</div><div class="metric small">28.2%</div><div class="delta">base case</div></div>
+      <div class="card span-3"><div class="label">Annual occupancy</div><div class="metric small">$32,536</div><div class="delta">$7,464 under $40K ceiling</div></div>
+      <div class="card span-3"><div class="label">Outside equity</div><div class="metric small">$150K</div><div class="delta">$50K owner · $210K project debt</div></div>
+    </div>
+  </div>
+
+  <div class="card span-12">
+    <h2 class="section-title">Four-lane authority map</h2>
+    <div class="grid">
+      <div class="card span-3"><div class="label">01 · Deal / Development</div><div class="value"><strong>CURRENT</strong></div><div class="kicker">Atlas_200_Washington_Underwriting · DOC-ATL-0001</div></div>
+      <div class="card span-3"><div class="label">02 · Fit-out / Equipment</div><div class="value"><strong>ACTIVE SCOPE</strong></div><div class="kicker">Fit-out responsibility · Layout Studio v3 · bar equipment planning · current kitchen lock</div></div>
+      <div class="card span-3"><div class="label">03 · Culinary</div><div class="value"><strong>TEST</strong></div><div class="kicker">ATLAS Master R&amp;D.xlsm · DOC-ATL-0002</div></div>
+      <div class="card span-3"><div class="label">04 · Brand / Design</div><div class="value"><strong>LOCKED DIRECTION</strong></div><div class="kicker">Render Style Guide v1 + approved component decision</div></div>
+    </div>
+  </div>
+
+  <div class="card span-6">
+    <h2 class="section-title">Fit-out / landlord scope</h2>
+    <div class="kicker">Locked startup framework</div>
+    <div class="value">$47.5K kitchen equipment · $45K kitchen / MEP / ventilation potential landlord offset · $50K interior / lighting / signage · $20K design.</div>
+    <div class="kicker">Core landlord ask</div>
+    <div class="value">Hood/exhaust · suppression · makeup air · electrical · plumbing/hot water · gas · HVAC · grease infrastructure · bathroom remediation/conversion · accessibility/life-safety · shell/substrates · handover/closeout.</div>
+    <div class="kicker">Next conversion</div>
+    <div class="value">After Tom review: retain agreed delivery language, resolve boundaries, add dates, and attach coordinated equipment / utility schedule.</div>
+  </div>
+
+  <div class="card span-6">
+    <h2 class="section-title">Equipment state</h2>
+    <div class="kicker">Current locked major kitchen line · DEC-ATL-0101</div>
+    <div class="value">96″ Traulsen TE096HT chef base supporting Rational iCombi Pro XS · Montague C36-8 griddle · Montague SB36-W salamander · Pitco SG14-S fryer · Vulcan VHP424 four-burner.</div>
+    <div class="kicker">Bar planning package</div>
+    <div class="value">$27,025 equipment + $6,600 install / MEP = <strong>$33,625 core all-in planning</strong>; $36,327.50 with 10% equipment contingency / freight.</div>
+    <div class="kicker">Status</div>
+    <div class="value">Final cut sheets, utility loads, supporting refrigeration, custom prep/warewashing and startup-budget reconciliation remain coordination work — not a reopened kitchen concept.</div>
+  </div>
+
+  <div class="card span-12">
+    <h2 class="section-title">Culinary R&amp;D pulse</h2>
+    <p class="section-sub">Summary state only. Recipe formulas, yields and methods remain inside the Culinary authority — not inside CIRCLE.</p>
+    <div class="grid">
+      <div class="card span-3"><div class="label">Active recipe records</div><div class="metric small">18</div><div class="delta">13 source LOCKED · 4 DRAFT · 1 TESTING</div></div>
+      <div class="card span-3"><div class="label">Dish bank</div><div class="metric small">64</div><div class="delta">59 banked · 4 test next · 1 active dev</div></div>
+      <div class="card span-3"><div class="label">Promote to menu dev</div><div class="metric small">5</div><div class="delta">flagged Y in dish bank</div></div>
+      <div class="card span-3"><div class="label">Controlled test entries</div><div class="metric small">20</div><div class="delta">0 test dates · 0 decisions recorded</div></div>
+    </div>
+    <div class="kicker">Semantic guardrail</div>
+    <div class="value">Source status <strong>LOCKED</strong> does not automatically equal CIRCLE <strong>CANON</strong>. First-production validation and recorded test decisions still matter before Operations handoff.</div>
+  </div>
+
+  <div class="card span-6">
+    <h2 class="section-title">Menu-development system</h2>
+    <div class="value">21 defined development slots: raw/cold, to begin, supper, alongside and sweet.</div>
+    <div class="kicker">Operating guardrails</div>
+    <div class="value">~15–18 savory dishes · 3–4 raw/cold · 4–5 to begin · 5–6 supper · 2–3 alongside · ~3 sweets · destination rice dish · fully gluten-free fryer · hand-cut shoestring fries as primary potato expression.</div>
+    <div class="kicker">Reality</div>
+    <div class="value">The menu matrix itself remains NOT STARTED; the pantry/system layer is materially further along.</div>
+  </div>
+
+  <div class="card span-6">
+    <h2 class="section-title">Brand / design truth</h2>
+    <div class="kicker">Design thesis</div>
+    <div class="value">Rhode Island is the subject. The Atlantic is the lens. Old Providence bones. Contemporary instincts.</div>
+    <div class="kicker">Current locked component package · DEC-ATL-0102</div>
+    <div class="value">18 Pera Wood Handle Back stools · Edith chandelier · 4 Bryant cordless sconces · oxblood banquette leather · tobacco-toned rift-cut white oak · Beaufort aged-brass hardware · dark leathered stone bar surface with dark bronze trim · lightly antiqued silver mirror.</div>
+    <div class="kicker">Hard nos</div>
+    <div class="value">Not nautical · rustic · industrial · steampunk · faux-historic · hotel-luxury · generic dark speakeasy · Birch reproduction.</div>
+  </div>
+
+  <div class="card span-6">
+    <h2 class="section-title">Deal conditions</h2>
+    <div class="attention"><div class="att-dot"></div><div><strong>Liquor license</strong><div class="value">Full-license path needs to be documented.</div></div></div>
+    <div class="attention"><div class="att-dot"></div><div><strong>MEP / hood</strong><div class="value">Hood, suppression, electrical load and related base-building systems must support the final menu and equipment schedule.</div></div></div>
+    <div class="attention"><div class="att-dot"></div><div><strong>Capital discipline</strong><div class="value">All-in occupancy ≤ $40K · startup uses ≤ $425K · $120K working capital remains protected.</div></div></div>
+    <div class="attention"><div class="att-dot"></div><div><strong>Lease protections</strong><div class="value">Sufficient term, options, assignment and TI protections.</div></div></div>
+  </div>
+
+  <div class="card span-6">
+    <h2 class="section-title">Authoritative sources</h2>
+    <div class="source"><div><strong>Atlas_200_Washington_Underwriting</strong><div class="kicker">Underwriting · DOC-ATL-0001</div></div><a href="https://docs.google.com/spreadsheets/d/1QDRwx-A5WAPz2GzlsBVzW-Q4I1O2UuSD_D4gi0NoBp4/edit?usp=drivesdk" target="_blank">Open ↗</a></div>
+    <div class="source"><div><strong>ATLAS Master R&amp;D.xlsm</strong><div class="kicker">Culinary · DOC-ATL-0002</div></div><span class="badge">CURRENT</span></div>
+    <div class="source"><div><strong>ATLAS_200_Washington_Tom_Fitout_Scope.xlsx</strong><div class="kicker">Fit-out scope · DOC-ATL-0003</div></div><span class="badge">CURRENT</span></div>
+    <div class="source"><div><strong>ATLAS · 200 Washington Layout Studio</strong><div class="kicker">Spatial truth · DOC-ATL-0004</div></div><span class="badge">v3</span></div>
+    <div class="source"><div><strong>ATLAS_Bar_Equipment_Spec_Budget.xlsx</strong><div class="kicker">Bar equipment planning · DOC-ATL-0005</div></div><span class="badge">CURRENT</span></div>
+    <div class="source"><div><strong>ATLAS_Render_Style_Guide_v1.docx</strong><div class="kicker">Design truth · DOC-ATL-0006</div></div><span class="badge">CURRENT</span></div>
+  </div>
+
+  <div class="card span-12">
+    <h2 class="section-title">Attention</h2>
+    <div class="attention"><div class="att-dot"></div><div><strong>Development next gate</strong><div class="value">Landlord fit-out response / deal alignment.</div><div class="kicker">DEV-0102 · SECURE</div></div></div>
+    <div class="attention"><div class="att-dot"></div><div><strong>Equipment coordination</strong><div class="value">Freeze final cut sheets / utilities around the current locked package and reconcile bar + support equipment against startup allocation.</div><div class="kicker">Concept is not reopened; this is coordination / costing.</div></div></div>
+    <div class="attention"><div class="att-dot"></div><div><strong>Culinary validation</strong><div class="value">Record production tests and decisions before source-LOCKED formulas become operational canon.</div><div class="kicker">CUL-ATL-0001 · TEST</div></div></div>
+  </div>
+</div>
+</section>
+</main></div><script>function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));const t=document.getElementById(id);if(t)t.classList.remove('hidden');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===id));window.scrollTo({top:0,behavior:'auto'})}document.querySelectorAll('[data-view]').forEach(el=>el.addEventListener('click',()=>showView(el.dataset.view)));document.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>showView(el.dataset.open)));</script><script>
+(function(){
+ const KEY='circle-home-v08';const names=['Miles','Financial workbook','Founder Dashboard','CIRCLE Portfolio','Google Calendar'];const VERIFIED_LINKS={'Financial workbook':'https://docs.google.com/spreadsheets/d/1meMGMy8CuJijIwJmzUp092ZNi1Myeq57EyKCV_x60SI/edit','CIRCLE Portfolio':'https://docs.google.com/spreadsheets/d/1pcF6-T6b85jXS6CJ525XzO-ALdqDEDEDE9dFOYZDJ4o/edit#gid=839886288','Google Calendar':'https://calendar.google.com/calendar/u/0/r'};
+ let state={items:[],links:{}};
+ try{const stored=JSON.parse(localStorage.getItem(KEY)||'null');if(stored&&Array.isArray(stored.items)&&typeof stored.links==='object')state=stored}catch(e){}
+ for(const [name,url] of Object.entries(VERIFIED_LINKS)){if(!state.links[name])state.links[name]=url;}const $=id=>document.getElementById(id);const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state));$('local-status').textContent='Saved in this browser · '+new Date().toLocaleTimeString()}catch(e){$('local-status').textContent='Browser storage unavailable; export to preserve your work.'}};
+ const el=(tag,txt,cls)=>{const n=document.createElement(tag);if(txt!==undefined)n.textContent=txt;if(cls)n.className=cls;return n};
+ function renderItems(){const list=$('work-items');list.replaceChildren();$('open-count').textContent='· '+state.items.filter(x=>!x.done).length+' open';if(!state.items.length){list.append(el('p','No local items yet. Add a real decision or action above.','section-sub'));return}
+ state.items.forEach(x=>{const row=el('div',undefined,'work-row'+(x.done?' done':'')),body=el('div'),b=el('strong',x.title),meta=el('div',x.entity+' · '+x.kind+' · '+(x.done?'Complete':'Open'),'work-meta'),actions=el('div',undefined,'work-buttons');body.append(b,meta);const toggle=el('button',x.done?'Reopen':'Complete'),del=el('button','Delete');toggle.type=del.type='button';toggle.onclick=()=>{x.done=!x.done;save();renderItems()};del.onclick=()=>{if(confirm('Remove this local work item?')){state.items=state.items.filter(y=>y.id!==x.id);save();renderItems()}};actions.append(toggle,del);row.append(body,actions);list.append(row)})}
+ function renderLinks(){const div=$('system-links');div.replaceChildren();names.forEach(name=>{const wrap=el('div',undefined,'link-entry'),label=el('label',name),inp=el('input');inp.type='url';inp.placeholder='https://';inp.className='link-input';inp.value=state.links[name]||'';const actions=el('div',undefined,'link-actions'),saveBtn=el('button','Save URL'),openBtn=el('button','Open ↗','url-launch');saveBtn.type=openBtn.type='button';saveBtn.onclick=()=>{const val=inp.value.trim();if(val&&!/^https:\/\//i.test(val)){$('local-status').textContent='Use an https:// link.';return}state.links[name]=val;save();renderLinks()};openBtn.disabled=!state.links[name];openBtn.onclick=()=>{const url=state.links[name];if(url&&/^https:\/\//i.test(url))window.open(url,'_blank','noopener,noreferrer')};actions.append(saveBtn,openBtn);wrap.append(label,inp,actions);div.append(wrap)})}
+ document.querySelectorAll('[data-promote]').forEach(btn=>btn.addEventListener('click',()=>{const key=btn.dataset.promote;if(state.items.some(i=>i.signalKey===key)){const info=$(key.startsWith('calendar-')?'calendar-promotion-status':'mail-promotion-status');if(info)info.textContent='Already in the local workboard.';return}state.items.unshift({id:(typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():Date.now().toString()+Math.random()),title:btn.dataset.title,entity:btn.dataset.entity,kind:btn.dataset.kind,done:false,signalKey:key});save();renderItems();btn.textContent='Added to workboard';btn.disabled=true;const info=$(key.startsWith('calendar-')?'calendar-promotion-status':'mail-promotion-status');if(info)info.textContent='Saved locally · Open the executive workboard below to manage it.'}));
+ document.querySelectorAll('[data-promote]').forEach(btn=>{if(state.items.some(i=>i.signalKey===btn.dataset.promote)){btn.disabled=true;btn.textContent='Already added'}});
+ $('work-form').addEventListener('submit',e=>{e.preventDefault();const title=$('work-title').value.trim();if(!title)return;state.items.unshift({id:(crypto.randomUUID?crypto.randomUUID():Date.now().toString()+Math.random()),title,entity:$('work-entity').value,kind:$('work-kind').value,done:false});$('work-title').value='';save();renderItems()});
+ $('export-state').onclick=()=>{const blob=new Blob([JSON.stringify({schema:'CIRCLE executive local workboard v0.8',exportedAt:new Date().toISOString(),...state},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download='circle-executive-workboard.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+ $('import-state').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!Array.isArray(data.items)||!data.links||typeof data.links!=='object'||data.items.length>2000)throw Error('Invalid workboard');state={items:data.items.filter(x=>typeof x.title==='string'&&typeof x.id!=='undefined').map(x=>({id:String(x.id),title:x.title.slice(0,180),entity:String(x.entity||'CIRCLE'),kind:String(x.kind||'Action'),done:!!x.done})),links:Object.fromEntries(names.map(n=>[n,typeof data.links[n]==='string'&&/^https:\/\//i.test(data.links[n])?data.links[n]:(VERIFIED_LINKS[n]||'')]))};save();renderItems();renderLinks()}catch(err){$('local-status').textContent='Import failed: incompatible JSON'}e.target.value=''};
+ renderItems();renderLinks();
+})();
+</script></body></html>
