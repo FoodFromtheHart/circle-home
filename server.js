@@ -33,7 +33,7 @@ function safeText(v,n=220){return typeof v==='string'?v.trim().slice(0,n):''}
 const sources=[
 {title:'Miles — Parallel (current)',kind:'application',url:'https://miles-parallel.foodfromthehart.chatgpt.site/?date=2026-10-14&service=dinner&station=all&view=cook&chef=prep',status:'Hart-confirmed current build; launch link only, not API-connected'},
 {title:'Bayberry Financial Workbook V2',kind:'spreadsheet',url:'https://docs.google.com/spreadsheets/d/1meMGMy8CuJijIwJmzUp092ZNi1Myeq57EyKCV_x60SI/edit',status:'Retrieved snapshot; refresh requires connector'},
-{title:'CIRCLE Core Registry',kind:'registry',url:'https://docs.google.com/spreadsheets/d/1pcF6-T6b85jXS6CJ525XzO-ALdqDEDE9dFOYZDJ4o/edit',status:'Retrieved snapshot; no writeback'},
+{title:'CIRCLE Core Registry',kind:'registry',url:'https://docs.google.com/spreadsheets/d/1pcF6-T6b85jXS6CJ525XzO-ALdqDEDEDE9dFOYZDJ4o/edit',status:'Retrieved snapshot; no writeback'},
 {title:'Founder Dashboard',kind:'application',url:null,status:'Exact app URL not verified'},
 {title:'Google Calendar',kind:'calendar',url:'https://calendar.google.com/calendar/u/0/r',status:'Snapshot only; no automatic polling'},
 {title:'Gmail',kind:'email',url:'https://mail.google.com/mail/u/0/#inbox',status:'Snapshot only; no automatic polling'}];
