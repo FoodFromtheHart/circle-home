@@ -1,51 +1,132 @@
 'use strict';
-const http=require('node:http');const fs=require('node:fs');const path=require('node:path');const crypto=require('node:crypto');
-const HOST=process.env.HOST||'127.0.0.1',PORT=Number(process.env.PORT||4177),ROOT=__dirname;
-const DATA_DIR=process.env.CIRCLE_DATA_DIR||path.join(ROOT,'data');
-const DB=path.join(DATA_DIR,'workboard.json');
-const ADMIN_TOKEN=process.env.CIRCLE_ADMIN_TOKEN||'';
-const HOSTED=HOST!=='127.0.0.1'&&HOST!=='localhost';
-if(HOSTED && (ADMIN_TOKEN.length<32 || !process.env.CIRCLE_DATA_DIR)){
-  console.error('Hosted mode requires CIRCLE_ADMIN_TOKEN (32+ chars) and CIRCLE_DATA_DIR (persistent volume).');
-  process.exit(1);
-}
-fs.mkdirSync(DATA_DIR,{recursive:true,mode:0o700});
-function authorized(req){
-  if(!HOSTED && !ADMIN_TOKEN)return true;
-  const header=req.headers.authorization||'';
-  if(!header.startsWith('Basic '))return false;
-  let credentials='';
-  try{credentials=Buffer.from(header.slice(6),'base64').toString('utf8')}catch{return false}
-  const idx=credentials.indexOf(':');
-  if(idx<0||credentials.slice(0,idx)!=='circle')return false;
-  const candidate=Buffer.from(credentials.slice(idx+1));
-  const expected=Buffer.from(ADMIN_TOKEN);
-  return candidate.length===expected.length&&crypto.timingSafeEqual(candidate,expected);
-}
-function unauthorized(res){res.writeHead(401,{'WWW-Authenticate':'Basic realm="CIRCLE Executive Home"','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end('Authentication required')}
-
-function store(){try{return JSON.parse(fs.readFileSync(DB,'utf8'))}catch(e){if(e.code==='ENOENT')return {version:1,items:[]};throw e}}
-function write(data){const p=DB+'.tmp';fs.writeFileSync(p,JSON.stringify(data,null,2),{mode:0o600});fs.renameSync(p,DB)}
-function response(res,code,data){res.writeHead(code,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data))}
-function readBody(req){return new Promise((resolve,reject)=>{let s='';req.on('data',c=>{s+=c;if(s.length>16000){reject(new Error('too large'));req.destroy()}});req.on('end',()=>{try{resolve(JSON.parse(s))}catch{reject(new Error('invalid json'))}});req.on('error',reject)})}
-const allowedTypes=['Decision','Action','Blocker'], allowedEntities=['CIRCLE','ENT-0101','ENT-0102','Miles'];
-function safeText(v,n=220){return typeof v==='string'?v.trim().slice(0,n):''}
-const sources=[
-{title:'Miles — Parallel (current)',kind:'application',url:'https://miles-parallel.foodfromthehart.chatgpt.site/?date=2026-10-14&service=dinner&station=all&view=cook&chef=prep',status:'Hart-confirmed current build; launch link only, not API-connected'},
-{title:'Bayberry Financial Workbook V2',kind:'spreadsheet',url:'https://docs.google.com/spreadsheets/d/1meMGMy8CuJijIwJmzUp092ZNi1Myeq57EyKCV_x60SI/edit',status:'Retrieved snapshot; refresh requires connector'},
-{title:'CIRCLE Core Registry',kind:'registry',url:'https://docs.google.com/spreadsheets/d/1pcF6-T6b85jXS6CJ525XzO-ALdqDEDEDE9dFOYZDJ4o/edit',status:'Retrieved snapshot; no writeback'},
-{title:'Founder Dashboard',kind:'application',url:null,status:'Exact app URL not verified'},
-{title:'Google Calendar',kind:'calendar',url:'https://calendar.google.com/calendar/u/0/r',status:'Snapshot only; no automatic polling'},
-{title:'Gmail',kind:'email',url:'https://mail.google.com/mail/u/0/#inbox',status:'Snapshot only; no automatic polling'}];
-const snapshot={retrievedAt:'2026-10-14',basis:'Verified Google Drive and Google Calendar reads; not continuously synced',bayberry:{weekEnding:'2026-10-11',sales:70640,covers:1088,salesPerCover:64.93,sourceStatus:'Toast API provisional'},atlas:{knownStartupUses:451000,ceiling:425000,gap:26000,phase:'SECURE',note:'Unresolved replacement exposure excluded; registry value'},calendar:[{title:'Ariana Monegro stage',start:'2026-10-17T09:00:00-04:00',end:'2026-10-17T14:00:00-04:00',url:'https://www.google.com/calendar/event?eid=ZWQwc3ZpcGpuOTBoMTA5c3NoNW9wcmw5bDQgaGFydEBiYXliZXJyeWdhcmRlbi5jb20'}],attention:[{entity:'ENT-0101',title:'Revenue Growth Plan',status:'IN_PROGRESS'},{entity:'ENT-0101',title:'Labor Gear Matrix',status:'IN_PROGRESS'},{entity:'ENT-0101',title:'Resolve staffing structure',status:'OPEN'},{entity:'ENT-0101',title:'2027 budget sign-off',status:'BLOCKED'},{entity:'ENT-0102',title:'Close retain / replace inventory and capital gap',status:'OPEN'}]};
+const http=require('node:http');
+const fs=require('node:fs');
+const path=require('node:path');
+const crypto=require('node:crypto');
+const {config:loadConfig}=require('./lib/config');
+const {Workboard}=require('./lib/storage');
+const {Integrations}=require('./lib/integrations');
+const archive=require('./lib/archive');
+const {SourceError}=require('./lib/google');
+const ROOT=__dirname;
 const MIME={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8'};
-const server=http.createServer(async(req,res)=>{try{const u=new URL(req.url,'http://localhost');if(u.pathname==='/healthz'&&req.method==='GET'){res.writeHead(200,{'Content-Type':'text/plain','Cache-Control':'no-store'});return res.end('ok')}
-if(!authorized(req))return unauthorized(res);
-const origin=req.headers.origin;
-if(origin){
-  const reqHost=req.headers.host;
-  let parsed;try{parsed=new URL(origin)}catch{return response(res,403,{error:'Origin denied'})}
-  if(parsed.host!==reqHost||(!['http:','https:'].includes(parsed.protocol)))return response(res,403,{error:'Origin denied'});
-}if(u.pathname.startsWith('/api/')){if(req.method==='GET'&&u.pathname==='/api/status')return response(res,200,{mode:HOSTED?'hosted':'local',automaticSync:false,milesWrites:false,authenticated:Boolean(ADMIN_TOKEN),sourceSnapshotDate:snapshot.retrievedAt});if(req.method==='GET'&&u.pathname==='/api/sources')return response(res,200,{sources,snapshot});if(req.method==='GET'&&u.pathname==='/api/workboard')return response(res,200,store());if(req.method==='POST'&&u.pathname==='/api/workboard'){const b=await readBody(req);if(!allowedTypes.includes(b.type)||!allowedEntities.includes(b.entity)||!safeText(b.title)||!['OPEN','IN_PROGRESS'].includes(b.status||'OPEN'))return response(res,400,{error:'Invalid item'});const d=store();const item={id:crypto.randomUUID(),type:b.type,entity:b.entity,title:safeText(b.title),status:b.status||'OPEN',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};d.items.unshift(item);write(d);return response(res,201,item)}const match=u.pathname.match(/^\/api\/workboard\/([\w-]+)$/);if(match&&req.method==='PATCH'){const b=await readBody(req),d=store(),it=d.items.find(x=>x.id===match[1]);if(!it)return response(res,404,{error:'Not found'});if(!['OPEN','IN_PROGRESS','DONE'].includes(b.status))return response(res,400,{error:'Invalid status'});it.status=b.status;it.updatedAt=new Date().toISOString();write(d);return response(res,200,it)}if(match&&req.method==='DELETE'){const d=store(),before=d.items.length;d.items=d.items.filter(x=>x.id!==match[1]);if(d.items.length===before)return response(res,404,{error:'Not found'});write(d);return response(res,200,{ok:true})}return response(res,404,{error:'Unknown API route'})}
-if(req.method!=='GET')return response(res,405,{error:'Method not allowed'});const file=u.pathname==='/'?'index.html':u.pathname.slice(1);if(!['index.html','app.js','styles.css','legacy-v1.3.html'].includes(file)){res.writeHead(404);return res.end('Not found')}const p=path.join(ROOT,'public',file);res.writeHead(200,{'Content-Type':MIME[path.extname(file)],'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'"});fs.createReadStream(p).pipe(res)
-}catch(e){response(res,500,{error:'Request failed'})}});if(require.main===module)server.listen(PORT,HOST,()=>console.log(`CIRCLE Home listening on ${HOST}:${PORT} (${HOSTED?'hosted':'local'} mode)`));module.exports={server};
+const CSP="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'";
+function authorized(req,c) {
+  if(!c.hosted && !c.token) return true;
+  const header=req.headers.authorization || '';
+  if(!header.startsWith('Basic ')) return false;
+  const credentials=Buffer.from(header.slice(6),'base64').toString('utf8');
+  const idx=credentials.indexOf(':');
+  if(idx<0 || credentials.slice(0,idx)!=='circle') return false;
+  const candidate=Buffer.from(credentials.slice(idx+1)),expected=Buffer.from(c.token);
+  return candidate.length===expected.length && crypto.timingSafeEqual(candidate,expected);
+}
+function response(res,code,data,headers={}) {
+  res.writeHead(code,{'Content-Type':'application/json; charset=utf-8',...headers});res.end(JSON.stringify(data));
+}
+function readBody(req,max=16000) {
+  return new Promise((resolve,reject)=>{
+    let size=0;const chunks=[];let rejected=false;
+    req.on('data',c=>{size+=c.length;if(size>max){rejected=true;reject(Object.assign(Error('Request body too large'),{status:413}));}else chunks.push(c)});
+    req.on('end',()=>{if(rejected)return;try{resolve(JSON.parse(Buffer.concat(chunks).toString('utf8')))}catch{reject(Object.assign(Error('Invalid JSON'),{status:400}))}});
+    req.on('error',reject);
+  });
+}
+function safeText(v,n=220) {return typeof v==='string'?v.trim().slice(0,n):'';}
+function createApp(c=loadConfig(),dependencies={}) {
+  const board=dependencies.board || new Workboard(c.dataDir,c.orgId);
+  const integrations=dependencies.integrations || new Integrations(c);
+  const startTime=new Date().toISOString();
+  let lastManualRefresh=0; const lastTests={};
+  const server=http.createServer(async(req,res)=>{
+    res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');
+    res.setHeader('Referrer-Policy','no-referrer');res.setHeader('Content-Security-Policy',CSP);
+    if(c.hosted)res.setHeader('Strict-Transport-Security','max-age=31536000');
+    try {
+      const u=new URL(req.url,'http://localhost');
+      if(u.pathname==='/healthz' && req.method==='GET'){res.writeHead(200,{'Content-Type':'text/plain'});return res.end('ok');}
+      if(!authorized(req,c)){res.writeHead(401,{'WWW-Authenticate':'Basic realm="CIRCLE Executive Home"'});return res.end('Authentication required');}
+      const mutating=!['GET','HEAD'].includes(req.method);
+      if(req.headers['sec-fetch-site']==='cross-site' && mutating) return response(res,403,{error:'Origin denied'});
+      if(req.headers.origin) {
+        let origin;try{origin=new URL(req.headers.origin);}catch{return response(res,403,{error:'Origin denied'});}
+        if(c.origin ? origin.origin!==c.origin : origin.host!==req.headers.host || !['http:','https:'].includes(origin.protocol)) return response(res,403,{error:'Origin denied'});
+      }
+      if(mutating && req.headers['content-type']?.split(';')[0]!=='application/json') return response(res,415,{error:'JSON content type required'});
+      if(u.pathname.startsWith('/api/')) {
+        if(req.method==='GET' && u.pathname==='/api/status') {
+          const views=integrations.views();
+          return response(res,200,{mode:c.hosted?'hosted':'local development',provider:c.provider,organization:{id:c.orgId,name:c.orgName},entityIds:c.entities,revision:c.revision,
+            startedAt:startTime,authenticated:Boolean(c.token),authentication:'single-owner Basic over HTTPS in hosted mode',
+            automaticSync:{enabled:Object.keys(views).filter(k=>views[k].enabled),healthy:Object.keys(views).filter(k=>views[k].status==='connected'),intervalSeconds:c.refreshMs/1000},
+            milesWrites:false,registryWrites:false,storage:board.status(),sourceSnapshotDate:c.isCircle?archive.snapshot.retrievedAt:null});
+        }
+        if(req.method==='GET' && u.pathname==='/api/executive')return response(res,200,integrations.executive());
+        if(req.method==='GET' && u.pathname==='/api/sources') return response(res,200,{
+          sources:[{title:'CIRCLE Core Registry',url:c.registryId?`https://docs.google.com/spreadsheets/d/${c.registryId}/edit`:null,status:integrations.view('registry').status},
+            {title:'Financial workbook',url:c.financialId?`https://docs.google.com/spreadsheets/d/${c.financialId}/edit`:null,status:integrations.view('financial').status},
+            {title:'Miles — Parallel (current)',url:c.milesUrl,status:'Verified destination; link only. No database access.'},
+            {title:'Gmail',url:'https://mail.google.com/mail/u/0/#inbox',status:integrations.view('gmail').status},
+            {title:'Google Calendar',url:'https://calendar.google.com/calendar/u/0/r',status:integrations.view('calendar').status}],
+          integrations:integrations.views(),snapshot:c.isCircle?archive.snapshot:null,snapshotStatus:'ARCHIVED — never substituted for live refresh'});
+        if(req.method==='POST' && u.pathname==='/api/refresh') {
+          if(Date.now()-lastManualRefresh<30000)return response(res,429,{error:'Refresh already requested; wait 30 seconds'},{'Retry-After':'30'});
+          lastManualRefresh=Date.now(); await integrations.refreshAll();return response(res,200,integrations.executive());
+        }
+        const test=u.pathname.match(/^\/api\/integrations\/(registry|financial|gmail|calendar)\/test$/);
+        if(req.method==='POST' && test) {
+          if(Date.now()-(lastTests[test[1]]||0)<30000)return response(res,429,{error:'Read test already requested; wait 30 seconds'});
+          lastTests[test[1]]=Date.now();return response(res,200,await integrations.test(test[1]));
+        }
+        if(req.method==='GET' && u.pathname==='/api/workboard')return response(res,200,board.read(),{ETag:`"${board.checksum()}"`});
+        if(req.method==='POST' && u.pathname==='/api/workboard/backup')return response(res,200,board.backup(),{'Content-Disposition':`attachment; filename="${c.orgId}-workboard-backup.json"`});
+        if(req.method==='POST' && u.pathname==='/api/workboard') {
+          const b=await readBody(req);
+          const entities=c.isCircle?['CIRCLE','Miles',...c.entities]:[c.orgId,...c.entities];
+          if(!b || !['Decision','Action','Blocker'].includes(b.type) || !entities.includes(b.entity) || !safeText(b.title) || !['OPEN','IN_PROGRESS'].includes(b.status||'OPEN'))return response(res,400,{error:'Invalid item'});
+          const now=new Date().toISOString();
+          const item={id:crypto.randomUUID(),type:b.type,entity:b.entity,title:safeText(b.title),status:b.status||'OPEN',createdAt:now,updatedAt:now};
+          board.mutate(req.headers['if-match'],d=>d.items.unshift(item));return response(res,201,item);
+        }
+        const match=u.pathname.match(/^\/api\/workboard\/([\w-]+)$/);
+        if(match && ['PATCH','DELETE'].includes(req.method)) {
+          const b=req.method==='PATCH'?await readBody(req):null;
+          if(req.method==='PATCH' && (!b || !['OPEN','IN_PROGRESS','DONE'].includes(b.status)))return response(res,400,{error:'Invalid status'});
+          const result=board.mutate(req.headers['if-match'],d=>{
+            const item=d.items.find(x=>x.id===match[1]);
+            if(!item)throw Object.assign(Error('Not found'),{status:404});
+            if(req.method==='PATCH'){item.status=b.status;item.updatedAt=new Date().toISOString();return item;}
+            d.items=d.items.filter(x=>x.id!==match[1]);return {ok:true};
+          });
+          return response(res,200,result);
+        }
+        return response(res,404,{error:'Unknown API route'});
+      }
+      if(req.method!=='GET') return response(res,405,{error:'Method not allowed'});
+      const file=u.pathname==='/'?'index.html':u.pathname.slice(1);
+      if(!['index.html','app.js','styles.css','legacy-v1.3.html'].includes(file) || (!c.isCircle && file==='legacy-v1.3.html'))return response(res,404,{error:'Not found'});
+      // Serve a neutral shell for non-CIRCLE environments; no embedded institutional snapshot.
+      let content=fs.readFileSync(path.join(ROOT,'public',file));
+      if(!c.isCircle && file==='index.html')content=Buffer.from(content.toString().replaceAll('CIRCLE', 'Executive').replaceAll('Bayberry','Operating business').replaceAll('ATLAS','Development'));
+      res.writeHead(200,{'Content-Type':MIME[path.extname(file)]});res.end(content);
+    } catch(e) {
+      if(!res.headersSent)response(res,e.status || (e instanceof SourceError?502:503),{error:e.status?e.message:e instanceof SourceError?e.message:'Request failed; existing records have been preserved',code:e instanceof SourceError?e.code:undefined});
+      else res.end();
+    }
+  });
+  server.requestTimeout=20000;server.headersTimeout=10000;
+  server.on('close',()=>integrations.stop());
+  return {server,board,integrations,config:c};
+}
+if(require.main===module) {
+  try {
+    const app=createApp();
+    app.server.listen(app.config.port,app.config.host,()=>{
+      console.log(`Executive Home listening (${app.config.provider}; organization ${app.config.orgId})`);
+      app.integrations.start();
+    });
+    const stop=()=>{app.integrations.stop();app.server.close(()=>process.exit(0));setTimeout(()=>process.exit(1),10000).unref();};
+    process.on('SIGTERM',stop);process.on('SIGINT',stop);
+  }catch(e){console.error(e.message);process.exit(1);}
+}
+module.exports={createApp,authorized};
