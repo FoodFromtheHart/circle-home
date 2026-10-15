@@ -6,7 +6,7 @@ This increment is based on deployed commit `6d2f5d64c7597f29f383eb392d6c444dc758
 
 - Only the owner can read `/api/communications`, initiate/complete Google consent, test reads or trigger refresh. Guests retain their previous snapshot/workboard scope.
 - Gmail uses `openid email gmail.readonly`; Calendar uses `openid email calendar.events.readonly`. There are no email sending or Calendar mutation operations.
-- The account is enforced as `hart@bayberrygarden.com`. The OAuth client is managed in the personal account's Cloud project; that does not make the personal inbox the source.
+- Hart corrected the source account on October 15, 2026: this new Gmail and Calendar connection is for `hboyd531@gmail.com`. The earlier Bayberry connection is separate and must be reconciled independently. This hosted increment currently supports one expected Google identity; do not describe it as linking both accounts.
 - Google authorization is stored encrypted in `CIRCLE_DATA_DIR/google-connections.enc.json` only after refreshing the granted token, verifying the expected identity and successfully reading that source. It uses the same encrypted format as the broader candidate.
 - Source payloads are memory-only in this increment. Each process starts without a live cache; enabled sources refresh at startup and every 15 minutes. Failed reads show an explicit error and retained data is marked LAST KNOWN. No refresh writes workboard records.
 - Existing Registry, financial and historical Calendar snapshots remain dated snapshots. Miles remains link-only.
@@ -20,8 +20,8 @@ Keep the existing owner token and `/var/data` path. Configure through Render's p
 | `CIRCLE_GOOGLE_OAUTH_CLIENT_ID` | Google Web application Client ID |
 | `CIRCLE_GOOGLE_OAUTH_CLIENT_SECRET` | Matching Client secret |
 | `CIRCLE_GOOGLE_TOKEN_KEY` | Existing securely generated 64-character hexadecimal key; preserve it |
-| `CIRCLE_GOOGLE_EXPECTED_EMAIL` | `hart@bayberrygarden.com` |
-| `CIRCLE_CALENDAR_ID` | `hart@bayberrygarden.com` |
+| `CIRCLE_GOOGLE_EXPECTED_EMAIL` | `hboyd531@gmail.com` |
+| `CIRCLE_CALENDAR_ID` | `hboyd531@gmail.com` |
 | `CIRCLE_GMAIL_QUERY` | `newer_than:30d -in:spam -in:trash -category:promotions {atlas investor investment capital landlord cornish "200 Washington" staffing}` |
 | `CIRCLE_GMAIL_ENABLED` | `false` until Gmail authorization/read passes |
 | `CIRCLE_CALENDAR_ENABLED` | `false` until Calendar authorization/read passes |
@@ -47,4 +47,6 @@ Before this increment, the current existing-code deployment is `dep-db8ep7nf3r2c
 - Corrected saved OAuth ID and secret passed private format checks in Render; no value was displayed. This is not proof the pair has authenticated.
 - Production workboard survived the preceding configuration redeploy with the original 304 bytes and SHA-256 `04d0030f2e11c45f7dc64ab5a2b2005240498418a96385716b544e4b6c5f8d89`. An off-volume backup is already verified privately.
 - Local increment tests: 7/7 passed; JavaScript syntax checks: 16 passed. These tests use synthetic transport and records, not authenticated Google data.
-- Hosted candidate preflight, deployment and actual Google consent/refresh are pending until recorded otherwise.
+- Isolated Render preflight and Node 24 GitHub Actions passed. PR #2 deployed code commit `cc651572b6f332d3c60618853a46e960f87c8dfd`; private owner and unauthenticated probes passed and the exact workboard bytes survived deployment.
+- Account-target correction: Render deployment `dep-db8fjkon74is73cjeodg` is live with only `CIRCLE_GOOGLE_EXPECTED_EMAIL` and `CIRCLE_CALENDAR_ID` changed to `hboyd531@gmail.com`. Before this change, the workboard matched its backup and neither an encrypted Google authorization file nor a legacy OAuth refresh token existed in this service. OAuth client credentials and the encryption key were preserved.
+- Actual Google consent, authenticated source reads, and automatic refresh remain pending. Both source enable flags remain false. See PR #2 for the current verification record.
