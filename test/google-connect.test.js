@@ -6,7 +6,7 @@ const {GoogleClient}=require('../lib/google');const {Integrations}=require('../l
 function setup(t,extra={}) {
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'circle-oauth-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
   return config({CIRCLE_DATA_DIR:dir,CIRCLE_ADMIN_TOKEN:'synthetic-owner-token-over-32-characters',CIRCLE_PUBLIC_ORIGIN:'https://circle.example',
-    CIRCLE_GOOGLE_OAUTH_CLIENT_ID:'synthetic-client',CIRCLE_GOOGLE_OAUTH_CLIENT_SECRET:'synthetic-client-secret',CIRCLE_GOOGLE_TOKEN_KEY:crypto.randomBytes(32).toString('hex'),
+    CIRCLE_GOOGLE_OAUTH_CLIENT_ID:'123456789012-syntheticclient.apps.googleusercontent.com',CIRCLE_GOOGLE_OAUTH_CLIENT_SECRET:'synthetic-client-secret',CIRCLE_GOOGLE_TOKEN_KEY:crypto.randomBytes(32).toString('hex'),
     CIRCLE_GOOGLE_EXPECTED_EMAIL:'executive@example.test',CIRCLE_GMAIL_QUERY:'newer_than:30d subject:synthetic',CIRCLE_CALENDAR_ID:'executive@example.test',...extra});
 }
 function transport(settings={}) {
@@ -29,6 +29,15 @@ function transport(settings={}) {
   }};
 }
 function flow(connections,id='gmail') {const f=connections.begin(id);const url=new URL(f.url);return {...f,url,params:new URLSearchParams({state:url.searchParams.get('state'),code:'synthetic-code'})};}
+
+test('misplaced Google client credentials block consent with actionable nonsecret setup labels',t=>{
+  const c=setup(t);c.oauth.clientSecret=c.oauth.clientId;c.oauth.clientId='Web application name';
+  const connections=new GoogleConnections(c);
+  const status=connections.status();assert.equal(status.sources.gmail.canConnect,false);
+  assert(status.setupRequired.some(x=>x.includes('Client ID')));assert(status.setupRequired.some(x=>x.includes('Client secret')));
+  assert(!JSON.stringify(status).includes(c.oauth.clientSecret));
+  assert.throws(()=>connections.begin('gmail'),e=>e.code==='configuration_missing');
+});
 
 test('OAuth independently tests offline access before persisting encrypted credentials; restarts recover them',async t=>{
   const c=setup(t),http=transport(),connections=new GoogleConnections(c,http.fetcher),f=flow(connections);

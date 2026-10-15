@@ -4,7 +4,9 @@
 
 The branch is a release candidate. Production promotion is blocked until Render owner/disk/restart verification and authenticated application-side Registry + financial refresh succeed. A successful read through ChatGPT is not the deployed Node service's authentication test.
 
-Production source baseline observed in GitHub: `5006b08d5c4d275359a3ed1785f5c9cabaf7119b`. Confirm the actual running Render deployment ID and commit before changing it. No main-branch change, production restart, data migration, reseed or Miles change is part of this branch's local tests.
+Current production source baseline: `6d2f5d64c7597f29f383eb392d6c444dc758127c`, including the independently delivered Brian read-only role. The development candidate incorporates that history and retains the existing guest snapshot/workboard surface. Confirm the actual running Render deployment ID and commit before changing it. No data migration, reseed or Miles change is part of this branch's tests.
+
+The Render `update_environment_variables` connector triggered a deployment of the existing production commit on October 15. Do not use that connector for a save-only change: the Dashboard's **Save only** option is the verified non-deploying path. Treat connector environment updates as deployments and prepare a current backup first.
 
 ## 1. Capture the existing environment
 
@@ -93,6 +95,10 @@ For a bad source connection, turn only its flag false and restart, leaving the b
 Render disk snapshots and code rollback are separate operations. Verify snapshot availability in the actual account rather than assuming a recovery point exists.
 
 ## Gmail and Calendar account linking
+
+### Existing guest access
+
+The optional existing `CIRCLE_VIEWER_TOKEN` and username `brian` retain read-only access to the prior dated snapshots and workboard. The candidate serves that guest interface separately. Guests cannot read the new executive/live-source payload, Google connection status, or credentials, and cannot initiate or complete consent, test or refresh sources, export backup envelopes, or mutate records. The owner remains `circle`. No guest token is created or enabled by this release, and no new communication data is added to the guest scope.
 
 The approved account for both connections is **hart@bayberrygarden.com**. The personal email associated with the existing Render workspace is a hosting account, not the account the application should read. ChatGPT's Google connections do not supply credentials to the hosted Node service.
 

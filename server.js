@@ -12,16 +12,19 @@ const {GoogleConnections,CALLBACK}=require('./lib/google-connect');
 const ROOT=__dirname;
 const MIME={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8'};
 const CSP="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'";
-function authorized(req,c) {
-  if(!c.hosted && !c.token) return true;
+function roleFor(req,c) {
+  if(!c.hosted && !c.token) return 'owner';
   const header=req.headers.authorization || '';
-  if(!header.startsWith('Basic ')) return false;
+  if(!header.startsWith('Basic ')) return null;
   const credentials=Buffer.from(header.slice(6),'base64').toString('utf8');
   const idx=credentials.indexOf(':');
-  if(idx<0 || credentials.slice(0,idx)!=='circle') return false;
-  const candidate=Buffer.from(credentials.slice(idx+1)),expected=Buffer.from(c.token);
-  return candidate.length===expected.length && crypto.timingSafeEqual(candidate,expected);
+  if(idx<0) return null;
+  const user=credentials.slice(0,idx),secret=user==='circle'?c.token:user==='brian'&&c.isCircle?c.viewerToken:'';
+  if(!secret || (user==='brian' && secret.length<32)) return null;
+  const candidate=Buffer.from(credentials.slice(idx+1)),expected=Buffer.from(secret);
+  return candidate.length===expected.length && crypto.timingSafeEqual(candidate,expected) ? user==='circle'?'owner':'viewer' : null;
 }
+function authorized(req,c) {return Boolean(roleFor(req,c));}
 function response(res,code,data,headers={}) {
   res.writeHead(code,{'Content-Type':'application/json; charset=utf-8',...headers});res.end(JSON.stringify(data));
 }
@@ -47,7 +50,16 @@ function createApp(c=loadConfig(),dependencies={}) {
     try {
       const u=new URL(req.url,'http://localhost');
       if(u.pathname==='/healthz' && req.method==='GET'){res.writeHead(200,{'Content-Type':'text/plain'});return res.end('ok');}
-      if(!authorized(req,c)){res.writeHead(401,{'WWW-Authenticate':'Basic realm="CIRCLE Executive Home"'});return res.end('Authentication required');}
+      const role=roleFor(req,c);
+      if(!role){res.writeHead(401,{'WWW-Authenticate':'Basic realm="CIRCLE Executive Home"'});return res.end('Authentication required');}
+      // Keep the previously approved guest surface. Live source data, Google
+      // authorization, refresh, tests, backups and all writes remain owner-only.
+      if(role==='viewer') {
+        const allowed=['/','/index.html','/app.js','/styles.css','/legacy-v1.3.html','/api/status','/api/sources','/api/workboard'];
+        if(req.method!=='GET' || !allowed.includes(u.pathname))return response(res,403,{error:'Read-only guest access: this operation requires the owner'});
+        if(u.pathname==='/api/status')return response(res,200,{mode:c.hosted?'hosted':'local development',role,automaticSync:false,milesWrites:false,authenticated:true,sourceSnapshotDate:archive.snapshot.retrievedAt});
+        if(u.pathname==='/api/sources')return response(res,200,{sources:archive.sources,snapshot:archive.snapshot});
+      }
       if(u.pathname===CALLBACK && req.method==='GET') {
         let result='failed';
         try {
@@ -72,7 +84,7 @@ function createApp(c=loadConfig(),dependencies={}) {
         }
         if(req.method==='GET' && u.pathname==='/api/status') {
           const views=integrations.views();
-          return response(res,200,{mode:c.hosted?'hosted':'local development',provider:c.provider,organization:{id:c.orgId,name:c.orgName},entityIds:c.entities,revision:c.revision,
+          return response(res,200,{mode:c.hosted?'hosted':'local development',role,provider:c.provider,organization:{id:c.orgId,name:c.orgName},entityIds:c.entities,revision:c.revision,
             startedAt:startTime,authenticated:Boolean(c.token),authentication:'single-owner Basic over HTTPS in hosted mode',
             automaticSync:{enabled:Object.keys(views).filter(k=>views[k].enabled),healthy:Object.keys(views).filter(k=>views[k].status==='connected'),intervalSeconds:c.refreshMs/1000},
             milesWrites:false,registryWrites:false,storage:board.status(),sourceSnapshotDate:c.isCircle?archive.snapshot.retrievedAt:null});
@@ -122,7 +134,8 @@ function createApp(c=loadConfig(),dependencies={}) {
       const file=u.pathname==='/'?'index.html':u.pathname.slice(1);
       if(!['index.html','app.js','styles.css','legacy-v1.3.html'].includes(file) || (!c.isCircle && file==='legacy-v1.3.html'))return response(res,404,{error:'Not found'});
       // Serve a neutral shell for non-CIRCLE environments; no embedded institutional snapshot.
-      let content=fs.readFileSync(path.join(ROOT,'public',file));
+      const servedFile=role==='viewer'&&['index.html','app.js'].includes(file)?'guest-'+file:file;
+      let content=fs.readFileSync(path.join(ROOT,'public',servedFile));
       if(!c.isCircle && file==='index.html')content=Buffer.from(content.toString().replaceAll('CIRCLE', 'Executive').replaceAll('Bayberry','Operating business').replaceAll('ATLAS','Development'));
       res.writeHead(200,{'Content-Type':MIME[path.extname(file)]});res.end(content);
     } catch(e) {
@@ -145,4 +158,4 @@ if(require.main===module) {
     process.on('SIGTERM',stop);process.on('SIGINT',stop);
   }catch(e){console.error(e.message);process.exit(1);}
 }
-module.exports={createApp,authorized};
+module.exports={createApp,authorized,roleFor};

@@ -2,6 +2,18 @@
 
 Updated: October 15, 2026 (America/New_York). Repository and verified Render production baseline: `5006b08d5c4d275359a3ed1785f5c9cabaf7119b`.
 
+### Subsequent evidence — 15:11 UTC
+
+The historical baseline below has been superseded by production commit `6d2f5d64c7597f29f383eb392d6c444dc758127c`, delivered independently with Brian's optional read-only role and hosted wording. That history is now reconciled into this development candidate. The candidate keeps the original guest snapshot/workboard surface and denies new live source data, Google controls, all mutation endpoints, and backup exports to guests. The expanded local suite passes **24/24 tests** and **19 JavaScript syntax checks**.
+
+Hart created a Google web OAuth client and saved its ID and secret directly in Render. The application account/filter configuration and a securely generated encryption key were subsequently saved, with both communication flags false. Secret values were not displayed or committed. This establishes configuration presence only, not validity or authentication.
+
+The Render environment-update connector unexpectedly also triggered deployment `dep-db8ep7nf3r2c73fica2g`, which went live at `2026-10-15T15:09:58.168907Z` on the **same existing production commit**. The new integration candidate was not deployed. Post-redeploy owner verification at `2026-10-15T15:11:36.776Z` confirmed the original 304-byte workboard retained the exact SHA-256 `04d0030f2e11c45f7dc64ab5a2b2005240498418a96385716b544e4b6c5f8d89` and original item ID; the authenticated HTTPS response matched disk, and an unauthenticated read returned 401. This is real hosted persistence evidence for the existing release, not a hosted candidate acceptance result.
+
+Safe format checks subsequently found that the saved Client ID was not in Google's Client ID format, while the value in the Client secret field ended in `.apps.googleusercontent.com`. No values were revealed. Hart needs to correct those fields directly in Render using **Save only**. The candidate now blocks consent for this misplaced-credential case with explicit setup labels; **25/25 tests** and **19 syntax checks** pass.
+
+Google authorization, independent application-side reads, scheduled refresh and candidate hosted acceptance remain pending. The first milestone is still not accepted. Future save-only environment changes must use the Dashboard option; the connector update is treated as a deployment.
+
 **First acceptance milestone: NOT YET ACCEPTED.** The candidate is implemented and locally tested. It has not been deployed, and authenticated automatic refresh on Render has not been demonstrated.
 
 ## Completed evidence
