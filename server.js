@@ -11,6 +11,7 @@ if(HOSTED && (ADMIN_TOKEN.length<32 || !process.env.CIRCLE_DATA_DIR)){
   process.exit(1);
 }
 fs.mkdirSync(DATA_DIR,{recursive:true,mode:0o700});
+const communications=require('./lib/communications-server').createCommunications();
 function roleFor(req){
   if(!HOSTED && !ADMIN_TOKEN)return 'owner';
   const header=req.headers.authorization||'';
@@ -46,12 +47,15 @@ const MIME={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8',
 const server=http.createServer(async(req,res)=>{try{const u=new URL(req.url,'http://localhost');if(u.pathname==='/healthz'&&req.method==='GET'){res.writeHead(200,{'Content-Type':'text/plain','Cache-Control':'no-store'});return res.end('ok')}
 const role=roleFor(req);
 if(!role)return unauthorized(res);
+if(await communications.handle(req,res,u,role))return;
 const origin=req.headers.origin;
 if(origin){
   const reqHost=req.headers.host;
   let parsed;try{parsed=new URL(origin)}catch{return response(res,403,{error:'Origin denied'})}
   if(parsed.host!==reqHost||(!['http:','https:'].includes(parsed.protocol)))return response(res,403,{error:'Origin denied'});
-}if(u.pathname.startsWith('/api/')){if(req.method==='GET'&&u.pathname==='/api/status')return response(res,200,{mode:HOSTED?'hosted':'local',role,automaticSync:false,milesWrites:false,authenticated:Boolean(ADMIN_TOKEN),sourceSnapshotDate:snapshot.retrievedAt});
+}if(u.pathname.startsWith('/api/')){if(req.method==='GET'&&u.pathname==='/api/status')return response(res,200,{mode:HOSTED?'hosted':'local',role,automaticSync:role==='owner'&&Object.values(communications.status().sources).some(s=>s.enabled),milesWrites:false,authenticated:Boolean(ADMIN_TOKEN),sourceSnapshotDate:snapshot.retrievedAt});
 if(role==='viewer'&&!['GET','HEAD'].includes(req.method))return response(res,403,{error:'Read-only access: editing is disabled'});if(req.method==='GET'&&u.pathname==='/api/sources')return response(res,200,{sources,snapshot});if(req.method==='GET'&&u.pathname==='/api/workboard')return response(res,200,store());if(req.method==='POST'&&u.pathname==='/api/workboard'){const b=await readBody(req);if(!allowedTypes.includes(b.type)||!allowedEntities.includes(b.entity)||!safeText(b.title)||!['OPEN','IN_PROGRESS'].includes(b.status||'OPEN'))return response(res,400,{error:'Invalid item'});const d=store();const item={id:crypto.randomUUID(),type:b.type,entity:b.entity,title:safeText(b.title),status:b.status||'OPEN',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};d.items.unshift(item);write(d);return response(res,201,item)}const match=u.pathname.match(/^\/api\/workboard\/([\w-]+)$/);if(match&&req.method==='PATCH'){const b=await readBody(req),d=store(),it=d.items.find(x=>x.id===match[1]);if(!it)return response(res,404,{error:'Not found'});if(!['OPEN','IN_PROGRESS','DONE'].includes(b.status))return response(res,400,{error:'Invalid status'});it.status=b.status;it.updatedAt=new Date().toISOString();write(d);return response(res,200,it)}if(match&&req.method==='DELETE'){const d=store(),before=d.items.length;d.items=d.items.filter(x=>x.id!==match[1]);if(d.items.length===before)return response(res,404,{error:'Not found'});write(d);return response(res,200,{ok:true})}return response(res,404,{error:'Unknown API route'})}
-if(req.method!=='GET')return response(res,405,{error:'Method not allowed'});const file=u.pathname==='/'?'index.html':u.pathname.slice(1);if(!['index.html','app.js','styles.css','legacy-v1.3.html'].includes(file)){res.writeHead(404);return res.end('Not found')}const p=path.join(ROOT,'public',file);res.writeHead(200,{'Content-Type':MIME[path.extname(file)],'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'"});fs.createReadStream(p).pipe(res)
-}catch(e){response(res,500,{error:'Request failed'})}});if(require.main===module)server.listen(PORT,HOST,()=>console.log(`CIRCLE Home listening on ${HOST}:${PORT} (${HOSTED?'hosted':'local'} mode)`));module.exports={server};
+if(req.method!=='GET')return response(res,405,{error:'Method not allowed'});const file=u.pathname==='/'?'index.html':u.pathname.slice(1);if(!['index.html','app.js','communications.js','styles.css','legacy-v1.3.html'].includes(file)){res.writeHead(404);return res.end('Not found')}const p=path.join(ROOT,'public',file);res.writeHead(200,{'Content-Type':MIME[path.extname(file)],'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'"});fs.createReadStream(p).pipe(res)
+}catch(e){response(res,500,{error:'Request failed'})}});server.on('close',()=>communications.stop());
+if(require.main===module)server.listen(PORT,HOST,()=>{console.log(`CIRCLE Home listening on ${HOST}:${PORT} (${HOSTED?'hosted':'local'} mode)`);communications.start();});
+module.exports={server,communications};
