@@ -25,7 +25,7 @@ Read [deployment and rollback](docs/DEPLOYMENT.md), [source contracts](docs/SOUR
 - Connections are disabled by default. `POST /api/integrations/{registry|financial|gmail|calendar}/test` tests one authenticated read without enabling it or modifying source records. Enable a connector only after its separate read test passes.
 - A failed refresh retains the previous successful data with an **error / last-known** state. Restarted caches require a fresh authenticated read before showing connected. No historical snapshot is substituted for an unavailable connector.
 - Verified retrieval, provisional financial figures, stale reporting periods and unavailable costs are separate facts. A Toast log saying VERIFIED does not turn provisional sales into a verified financial close.
-- Gmail and Calendar are separate disabled increments. They require user OAuth credentials and explicit correspondence/calendar scope. They read bounded metadata/events and never send messages or create events.
+- Gmail and Calendar have independent **Connect** buttons in Systems & sources once the Google web client and encrypted token storage are configured. Each verifies the expected account and tests an offline authenticated read before storing authorization. Automatic refresh stays disabled until explicitly enabled after testing. They read bounded metadata/events and never send messages or create events.
 - Miles remains link-only. There is no Miles database driver, connection, refresh job or write route.
 
 ## Storage and boundaries

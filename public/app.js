@@ -2,9 +2,11 @@
 const $=s=>document.querySelector(s);
 const node=(tag,text,klass)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(klass)e.className=klass;return e;};
 let items=[],revision='',busy=false,organization=null;
+const googleCallback=new URLSearchParams(window.location.search).get('google');
 const money=v=>typeof v==='number'?v.toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}):'Unavailable';
 const num=v=>typeof v==='number'?v.toLocaleString('en-US',{maximumFractionDigits:2}):'Unavailable';
 const dateTime=v=>v?new Date(v).toLocaleString('en-US',{timeZone:'America/New_York',dateStyle:'medium',timeStyle:'short'})+' ET':'Never';
+const calendarResponse=e=>({needsAction:'Invitation needs your response',accepted:'You accepted',tentative:'You responded tentative',declined:'You declined'}[e.responseStatus] || 'Your response is not recorded');
 async function api(url,opts={}) {
   const r=await fetch(url,{...opts,headers:{'Content-Type':'application/json',...opts.headers}});
   if(r.status===401)throw Error('Owner authentication required. Reload and sign in.');
@@ -57,7 +59,7 @@ function paintExecutive({sources,briefing,cacheWarning}) {
   const changes=Object.values(sources).flatMap(s=>(s.changes?.items || []).map(c=>row(c.title,`Observed ${dateTime(s.changes.observedAt)} · ${s.id}`,`${c.kind} · ${label(s)}`,c.source)));
   $('#changes').replaceChildren(...changes);
   if(!changes.length)empty('#changes',Object.values(sources).some(s=>s.data)?'No changes observed since the retained baseline. The first read establishes a baseline.':'Awaiting a successful authenticated baseline.');
-  const cal=sources.calendar;$('#calendar').replaceChildren(...(cal.data?.events || []).slice(0,8).map(e=>row(e.title,`${e.allDay?e.start+' · all day':dateTime(e.start)}${e.location?' · '+e.location:''}`,`${e.status || 'Commitment'} · ${label(cal)}`,e.source)));
+  const cal=sources.calendar;$('#calendar').replaceChildren(...(cal.data?.events || []).slice(0,8).map(e=>row(e.title,`${e.allDay?e.start+' · all day':dateTime(e.start)}${e.location?' · '+e.location:''} · ${calendarResponse(e)}`,`${e.status || 'Commitment'} · ${label(cal)}`,e.source)));
   if(!$('#calendar').childElementCount)empty('#calendar',cal.status==='connected'?'No commitments in the next 30 days.':`Calendar ${cal.status}. Historical events are in the preserved snapshot.`);
   if(cal.data?.moreAvailable)$('#calendar').append(node('p','More events are available in the source calendar.','muted small'));
   const mail=sources.gmail;$('#correspondence').replaceChildren(...(mail.data?.threads || []).slice(0,8).map(t=>row(t.title,`${t.from} · ${dateTime(t.receivedAt)} · Candidate for owner review`,label(mail),t.source)));
@@ -75,6 +77,20 @@ function paintExecutive({sources,briefing,cacheWarning}) {
 }
 async function loadSources(){
   const result=await api('/api/sources');
+  const connection=result.googleConnection,panel=$('#googleconnect');panel.replaceChildren(node('strong','Connect your executive Google account'));
+  if(googleCallback && googleCallback!=='linked')panel.append(node('p','Google connection did not complete. Check the message below or connect again.'));
+  panel.append(node('p',connection.expectedEmail || 'Set the executive Google email in hosting configuration.'));
+  panel.append(node('p','Gmail reads matching correspondence; Calendar reads upcoming events. Each connection asks for read-only access and verifies the selected account.','small'));
+  if(connection.setupRequired.length)panel.append(node('p','Hosting setup required: '+connection.setupRequired.join(', '),'small'));
+  if(connection.storageError)panel.append(node('p',connection.storageError));
+  for(const [id,s] of Object.entries(connection.sources)) {
+    const title=id==='gmail'?'Gmail':'Calendar',line=node('div',undefined,'source'),left=node('div');
+    left.append(node('strong',title),node('p',s.linked?`${s.email} · read verified ${dateTime(s.testedAt)} · automatic refresh ${result.integrations[id].enabled?'enabled':'disabled'}`:s.scopeConfigured?'Not linked in this application.':'Choose the correspondence query or calendar in hosting configuration.'));
+    if(s.error)left.append(node('p',s.error));
+    const button=node('button',s.linked?'Reconnect '+title:'Connect '+title,'subtle');button.disabled=!s.canConnect;
+    button.onclick=async()=>{button.disabled=true;try{const f=await api('/api/google/connect',{method:'POST',body:JSON.stringify({source:id})});window.location.assign(f.url);}catch(e){left.append(node('p',e.message));button.disabled=false;}};
+    line.append(left,button);panel.append(line);
+  }
   $('#sourcelist').replaceChildren(...result.sources.map(s=>{const v=node('div',undefined,'source'),left=node('div');left.append(node('strong',s.title),node('p',s.status));v.append(left);if(s.url)v.append(link('Open ↗',s.url));return v;}));
   for(const [id,s] of Object.entries(result.integrations)){
     const v=node('div',undefined,'source'),left=node('div');left.append(node('strong',`${id} · ${label(s)}`),node('p',`Server credentials: ${s.configured?'configured':'missing'} · last success ${dateTime(s.lastSuccessAt)} · source modified ${dateTime(s.sourceModifiedAt)}`));if(s.error)left.append(node('p',`${s.error.code}: ${s.error.message}`));
@@ -86,6 +102,8 @@ async function loadSources(){
 async function update(){if(busy)return;busy=true;try{paintExecutive(await api('/api/executive'));await loadSources();}catch(e){$('#health').textContent='Connection to application unavailable';$('#basis').textContent=`Displayed values are not current: ${e.message}`;for(const id of ['salesbasis','coverdetail','capitalbasis'])$('#'+id).textContent='STALE — application connection failed';document.querySelectorAll('#home .tag').forEach(e=>{if(!e.textContent.includes('APPLICATION UNAVAILABLE'))e.textContent+=' · STALE / APPLICATION UNAVAILABLE';});}finally{busy=false;}}
 $('#refresh').onclick=async()=>{const b=$('#refresh');b.disabled=true;try{paintExecutive(await api('/api/refresh',{method:'POST',body:'{}'}));await loadSources();}catch(e){$('#basis').textContent=e.message;}finally{b.disabled=false;}};
 (async()=>{try{
+  if(window.location.hash==='#sources')show('sources');
+  if(googleCallback)history.replaceState(null,'','/#sources');
   const st=await api('/api/status');organization={...st.organization,mode:st.mode};
   $('#orgname').replaceChildren(node('span',st.organization.name,'org-title'));$('#environment').textContent=`Executive Home · ${st.provider}`;
   if(st.organization.id!=='circle'){const select=$('#entityoptions');select.replaceChildren(...[st.organization.id,...st.entityIds].map(id=>{const o=node('option',id);o.value=id;return o;}));}

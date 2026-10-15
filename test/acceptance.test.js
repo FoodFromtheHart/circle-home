@@ -105,9 +105,9 @@ test('source response failures never leak credential or upstream response text',
 });
 test('Gmail and Calendar are independent, bounded, read-only increments',async t=>{
  const c=setup(t,{CIRCLE_GMAIL_QUERY:'newer_than:30d subject:synthetic',CIRCLE_CALENDAR_ID:'synthetic-calendar'});const calls=[];
- const client={get:async(url,kind)=>{calls.push({url,kind});if(url.includes('/events?'))return {timeZone:'America/New_York',items:[{id:'e1',summary:'Synthetic meeting',start:{date:'2026-10-16'},end:{date:'2026-10-17'},status:'confirmed',htmlLink:'https://calendar.google.com/event?eid=synthetic'}]};if(url.includes('/threads?'))return {threads:[{id:'abc'}],nextPageToken:'more'};return {id:'abc',messages:[{internalDate:'1792022400000',snippet:'Synthetic',payload:{headers:[{name:'Subject',value:'Synthetic thread'}]}}]};}};
+ const client={account:async()=>({email:'synthetic@example.test'}),get:async(url,kind)=>{calls.push({url,kind});if(url.includes('/events?'))return {timeZone:'America/New_York',items:[{id:'e1',summary:'Synthetic meeting',start:{date:'2026-10-16'},end:{date:'2026-10-17'},status:'confirmed',htmlLink:'https://calendar.google.com/event?eid=synthetic'}]};if(url.includes('/threads?'))return {threads:[{id:'abc'}],nextPageToken:'more'};return {id:'abc',messages:[{internalDate:'1792022400000',snippet:'Synthetic',payload:{headers:[{name:'Subject',value:'Synthetic thread'}]}}]};}};
  const mail=await readGmail(client,c);assert.equal(mail.threads.length,1);assert(mail.moreAvailable);assert(mail.threads[0].status.includes('candidate'));assert(calls[1].url.includes('format=metadata'));
- const cal=await readCalendar(client,c,new Date('2026-10-15'));assert(cal.events[0].allDay);assert.equal(calls[2].kind,'personal');assert(!calls.some(c=>c.url.includes('/send')));
+ const cal=await readCalendar(client,c,new Date('2026-10-15'));assert(cal.events[0].allDay);assert.equal(calls[2].kind,'calendar');assert(!calls.some(c=>c.url.includes('/send')));
  await assert.rejects(()=>readGmail(client,{...c,gmailQuery:''}),/explicit/);
 });
 test('external organization API never exposes CIRCLE archive or legacy UI',async t=>{

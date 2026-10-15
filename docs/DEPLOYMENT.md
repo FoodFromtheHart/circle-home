@@ -92,17 +92,52 @@ For a bad source connection, turn only its flag false and restart, leaving the b
 
 Render disk snapshots and code rollback are separate operations. Verify snapshot availability in the actual account rather than assuming a recovery point exists.
 
-## Later increments: Gmail and Calendar
+## Gmail and Calendar account linking
 
-Use a Google OAuth web client with an offline refresh token authorized for `gmail.readonly` and `calendar.events.readonly`. Do not reuse the service-account credential or add domain-wide delegation. Grant only the increment being enabled. Gmail's search query requires gmail.readonly; gmail.metadata does not support `q`.
+The approved account for both connections is **hart@bayberrygarden.com**. The personal email associated with the existing Render workspace is a hosting account, not the account the application should read. ChatGPT's Google connections do not supply credentials to the hosted Node service.
 
-Configure an explicit `CIRCLE_GMAIL_QUERY` for executive correspondence (approved labels or project/sender filters), or `CIRCLE_CALENDAR_ID` for the selected calendar. The Google account used by OAuth is the account read by the app; ChatGPT's own Google connection is independent.
+Use a Google OAuth **Web application** client in an approved Google Cloud project with Gmail API and Google Calendar API enabled. Configure the consent audience for the organization/account and register this exact production redirect URI:
+
+```
+https://circle-home.onrender.com/oauth/google/callback
+```
+
+Register the staging service's equivalent HTTPS URI separately. Set the following through the hosting service's protected environment controls, preserving every existing variable, owner token and data path:
+
+| Variable | Value / purpose |
+| --- | --- |
+| `CIRCLE_GOOGLE_OAUTH_CLIENT_ID` | The Google web client's ID |
+| `CIRCLE_GOOGLE_OAUTH_CLIENT_SECRET` | Its secret; never put it in chat or Git |
+| `CIRCLE_GOOGLE_TOKEN_KEY` | A stable random 32-byte key encoded as 64 hexadecimal characters, stored separately from the disk |
+| `CIRCLE_GOOGLE_EXPECTED_EMAIL` | `hart@bayberrygarden.com` |
+| `CIRCLE_CALENDAR_ID` | `hart@bayberrygarden.com` |
+| `CIRCLE_GMAIL_QUERY` | Explicit executive correspondence query below, or a narrower owner-selected label/query |
+| `CIRCLE_GMAIL_ENABLED` | `false` until its authenticated read passes |
+| `CIRCLE_CALENDAR_ENABLED` | `false` until its authenticated read passes |
+
+The bounded query used in the connector verification was:
+
+```
+newer_than:30d -in:spam -in:trash -category:promotions {atlas investor investment capital landlord cornish "200 Washington" staffing}
+```
+
+Generate the encryption key using a secure secret-generation facility and retain it in the approved secret store. Do not rotate or overwrite an existing key without a token recovery plan. The application refuses to overwrite an encrypted connection file that cannot be decrypted under its original organization, account, client ID and key. A disk backup alone cannot recover authorization without the key. Workboard backups do not contain Google credentials.
+
+In the owner-authenticated **Systems & sources** page, choose **Connect Gmail**, approve read-only access as the expected account, and return to the app. Repeat independently for **Connect Calendar**. The server uses one-time browser-bound state, a ten-minute expiry, PKCE, and a fixed redirect URI. The browser receives no access or refresh token. It verifies the email through Google's authenticated UserInfo endpoint, checks the granted source scope, uses the offline refresh token, and performs that source's read before saving any new authorization. Wrong-account selection, refused consent, missing permission or a failed read leaves the previous stored authorization unchanged.
+
+Each connection requests `openid email` plus only its source scope: `gmail.readonly` or `calendar.events.readonly`. Gmail's search query requires gmail.readonly; gmail.metadata does not support `q`. Google provides identity permission so the application can enforce the expected account on every read. The Gmail payload is limited by the adapter to message metadata and snippets. Tokens are encrypted with AES-256-GCM in `CIRCLE_DATA_DIR/google-connections.enc.json`, atomically saved with mode 0600. Do not log OAuth callback queries or export tokens to browser code.
+
+When the callback reports a successful independent read, enable **only that source** through its Render environment flag. Verify an initial refresh and an automatic refresh with advancing timestamps. The existing scheduler reads enabled sources every 15 minutes by default. Authorization alone is never labelled live synchronization. An optional legacy `CIRCLE_GOOGLE_OAUTH_REFRESH_TOKEN` remains supported but must include identity scopes and pass the same expected-account check.
 
 Test each disabled adapter with its own Test read button; enable only the one that passes. Gmail returns at most 25 threads, using message metadata and snippets. Calendar returns at most 100 events in the next 30 days, including all-day events. Both explicitly flag additional available results; neither implies the bounded view is exhaustive. Follow-ups are candidates for owner review, not automatic tasks, decisions or sent messages. Meeting preparation links to the event/context; project relationships are not guessed from titles.
+
+Calendar event confirmation and the owner's invitation response are shown separately. Gmail links select the verified account explicitly to avoid opening the personal inbox when several Google accounts are signed in. To suspend reads, set only the affected enabled flag to false. To revoke Google consent, use the account's Google third-party connection controls; revoked or expired tokens must produce an explicit connection error, never current-looking cached data.
 
 ## Primary implementation references
 
 - https://developers.google.com/identity/protocols/oauth2/service-account
+- https://developers.google.com/identity/protocols/oauth2/web-server
+- https://developers.google.com/identity/openid-connect/openid-connect
 - https://developers.google.com/workspace/sheets/api/reference/rest/v4/spreadsheets.values/batchGet
 - https://developers.google.com/workspace/gmail/api/reference/rest/v1/users.threads/list
 - https://developers.google.com/workspace/calendar/api/v3/reference/events/list

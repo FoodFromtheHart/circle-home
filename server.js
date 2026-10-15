@@ -7,7 +7,8 @@ const {config:loadConfig}=require('./lib/config');
 const {Workboard}=require('./lib/storage');
 const {Integrations}=require('./lib/integrations');
 const archive=require('./lib/archive');
-const {SourceError}=require('./lib/google');
+const {SourceError,GoogleClient}=require('./lib/google');
+const {GoogleConnections,CALLBACK}=require('./lib/google-connect');
 const ROOT=__dirname;
 const MIME={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8'};
 const CSP="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'";
@@ -35,7 +36,8 @@ function readBody(req,max=16000) {
 function safeText(v,n=220) {return typeof v==='string'?v.trim().slice(0,n):'';}
 function createApp(c=loadConfig(),dependencies={}) {
   const board=dependencies.board || new Workboard(c.dataDir,c.orgId);
-  const integrations=dependencies.integrations || new Integrations(c);
+  const connections=dependencies.connections || new GoogleConnections(c,dependencies.googleFetch || fetch);
+  const integrations=dependencies.integrations || new Integrations(c,new GoogleClient(c,dependencies.googleFetch || fetch,id=>connections.credentials(id)));
   const startTime=new Date().toISOString();
   let lastManualRefresh=0; const lastTests={};
   const server=http.createServer(async(req,res)=>{
@@ -46,6 +48,16 @@ function createApp(c=loadConfig(),dependencies={}) {
       const u=new URL(req.url,'http://localhost');
       if(u.pathname==='/healthz' && req.method==='GET'){res.writeHead(200,{'Content-Type':'text/plain'});return res.end('ok');}
       if(!authorized(req,c)){res.writeHead(401,{'WWW-Authenticate':'Basic realm="CIRCLE Executive Home"'});return res.end('Authentication required');}
+      if(u.pathname===CALLBACK && req.method==='GET') {
+        let result='failed';
+        try {
+          const linked=await connections.complete(u.searchParams,req.headers.cookie);
+          delete integrations.client.tokens[linked.id];
+          if(c.enabled[linked.id])await integrations.refresh(linked.id);
+          result='linked';
+        }catch{/* No authorization code, provider response, or token is echoed or logged. */}
+        res.writeHead(303,{Location:`/?google=${result}#sources`,'Set-Cookie':connections.cookie('',0)});return res.end();
+      }
       const mutating=!['GET','HEAD'].includes(req.method);
       if(req.headers['sec-fetch-site']==='cross-site' && mutating) return response(res,403,{error:'Origin denied'});
       if(req.headers.origin) {
@@ -54,6 +66,10 @@ function createApp(c=loadConfig(),dependencies={}) {
       }
       if(mutating && req.headers['content-type']?.split(';')[0]!=='application/json') return response(res,415,{error:'JSON content type required'});
       if(u.pathname.startsWith('/api/')) {
+        if(req.method==='POST' && u.pathname==='/api/google/connect') {
+          const b=await readBody(req);const flow=connections.begin(b?.source);
+          return response(res,200,{url:flow.url},{'Set-Cookie':flow.cookie});
+        }
         if(req.method==='GET' && u.pathname==='/api/status') {
           const views=integrations.views();
           return response(res,200,{mode:c.hosted?'hosted':'local development',provider:c.provider,organization:{id:c.orgId,name:c.orgName},entityIds:c.entities,revision:c.revision,
@@ -66,9 +82,9 @@ function createApp(c=loadConfig(),dependencies={}) {
           sources:[{title:'CIRCLE Core Registry',url:c.registryId?`https://docs.google.com/spreadsheets/d/${c.registryId}/edit`:null,status:integrations.view('registry').status},
             {title:'Financial workbook',url:c.financialId?`https://docs.google.com/spreadsheets/d/${c.financialId}/edit`:null,status:integrations.view('financial').status},
             {title:'Miles — Parallel (current)',url:c.milesUrl,status:'Verified destination; link only. No database access.'},
-            {title:'Gmail',url:'https://mail.google.com/mail/u/0/#inbox',status:integrations.view('gmail').status},
-            {title:'Google Calendar',url:'https://calendar.google.com/calendar/u/0/r',status:integrations.view('calendar').status}],
-          integrations:integrations.views(),snapshot:c.isCircle?archive.snapshot:null,snapshotStatus:'ARCHIVED — never substituted for live refresh'});
+            {title:'Gmail',url:`https://mail.google.com/mail/u/?authuser=${encodeURIComponent(c.googleExpectedEmail)}#inbox`,status:integrations.view('gmail').status},
+            {title:'Google Calendar',url:`https://calendar.google.com/calendar/u/0/r?authuser=${encodeURIComponent(c.googleExpectedEmail)}`,status:integrations.view('calendar').status}],
+          googleConnection:connections.status(),integrations:integrations.views(),snapshot:c.isCircle?archive.snapshot:null,snapshotStatus:'ARCHIVED — never substituted for live refresh'});
         if(req.method==='POST' && u.pathname==='/api/refresh') {
           if(Date.now()-lastManualRefresh<30000)return response(res,429,{error:'Refresh already requested; wait 30 seconds'},{'Retry-After':'30'});
           lastManualRefresh=Date.now(); await integrations.refreshAll();return response(res,200,integrations.executive());
@@ -116,7 +132,7 @@ function createApp(c=loadConfig(),dependencies={}) {
   });
   server.requestTimeout=20000;server.headersTimeout=10000;
   server.on('close',()=>integrations.stop());
-  return {server,board,integrations,config:c};
+  return {server,board,integrations,connections,config:c};
 }
 if(require.main===module) {
   try {

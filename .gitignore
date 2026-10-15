@@ -10,3 +10,4 @@ backups/
 coverage/
 test-results/
 private-evidence/
+google-connections.enc.json
